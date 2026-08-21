@@ -1,0 +1,33 @@
+package main
+
+import "fmt"
+
+type Expr interface {
+	String() string
+}
+
+type LiteralExpr struct {
+	Value int
+}
+
+func (e LiteralExpr) String() string {
+	return fmt.Sprintf("%d", e.Value)
+}
+
+type BinaryExpr struct {
+	Left     Expr
+	Operator Token
+	Right    Expr
+}
+
+func (e BinaryExpr) String() string {
+	return fmt.Sprintf("(%s %s %s)", e.Left, e.Operator.Value, e.Right)
+}
+
+type GroupExpr struct {
+	Expression Expr
+}
+
+func (e GroupExpr) String() string {
+	return fmt.Sprintf("(group %s)", e.Expression)
+}
