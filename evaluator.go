@@ -2,6 +2,24 @@ package main
 
 import "fmt"
 
+func evalUnary(expr *UnaryExpr) (int, error) {
+	operandEval, err := Eval(expr.Operand)
+
+	if err != nil {
+		return 0, err
+	}
+
+	switch expr.Operator.Type {
+	case Plus:
+		return operandEval, nil
+	case Minus:
+		return -operandEval, nil
+	default:
+		return 0, fmt.Errorf("Invalid unary operator %s", expr.Operator)
+	}
+
+}
+
 func evalBinary(expr *BinaryExpr) (int, error) {
 	left, err := Eval(expr.Left)
 
@@ -35,6 +53,8 @@ func Eval(expr Expr) (int, error) {
 	switch expr := expr.(type) {
 	case *LiteralExpr:
 		return expr.Value, nil
+	case *UnaryExpr:
+		return evalUnary(expr)
 	case *BinaryExpr:
 		return evalBinary(expr)
 	case *GroupExpr:

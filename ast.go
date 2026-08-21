@@ -14,6 +14,15 @@ func (e LiteralExpr) String() string {
 	return fmt.Sprintf("%d", e.Value)
 }
 
+type UnaryExpr struct {
+	Operator Token
+	Operand  Expr
+}
+
+func (e UnaryExpr) String() string {
+	return fmt.Sprintf("(%s%s)", e.Operator.Value, e.Operand)
+}
+
 type BinaryExpr struct {
 	Left     Expr
 	Operator Token

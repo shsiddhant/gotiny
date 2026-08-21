@@ -12,6 +12,34 @@ func TestParser(t *testing.T) {
 			expected: "1",
 		},
 		{
+			input:    "-1",
+			expected: "(-1)",
+		},
+		{
+			input:    "+1",
+			expected: "(+1)",
+		},
+		{
+			input:    "--1",
+			expected: "(-(-1))",
+		},
+		{
+			input:    "2 + -5",
+			expected: "(2 + (-5))",
+		},
+		{
+			input:    "2 * -3",
+			expected: "(2 * (-3))",
+		},
+		{
+			input:    "-2 * 3",
+			expected: "((-2) * 3)",
+		},
+		{
+			input:    "-(1 + 2)",
+			expected: "(-(group (1 + 2)))",
+		},
+		{
 			input:    "1 + 2",
 			expected: "(1 + 2)",
 		},

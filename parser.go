@@ -75,8 +75,27 @@ func (p *Parser) primary() (Expr, error) {
 	return nil, fmt.Errorf("expected expression, got %s", p.current.Type)
 }
 
+func (p *Parser) unary() (Expr, error) {
+	if p.current.Type == Plus || p.current.Type == Minus {
+		operator := p.current
+
+		if err := p.advance(); err != nil {
+			return nil, err
+		}
+
+		operand, err := p.unary()
+
+		if err != nil {
+			return nil, err
+		}
+
+		return &UnaryExpr{Operator: operator, Operand: operand}, nil
+	}
+	return p.primary()
+}
+
 func (p *Parser) multiplication() (Expr, error) {
-	expr, err := p.primary()
+	expr, err := p.unary()
 
 	if err != nil {
 		return nil, err
@@ -88,7 +107,7 @@ func (p *Parser) multiplication() (Expr, error) {
 		if err := p.advance(); err != nil {
 			return nil, err
 		}
-		right, err := p.primary()
+		right, err := p.unary()
 
 		if err != nil {
 			return nil, err

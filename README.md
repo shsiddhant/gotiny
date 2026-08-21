@@ -15,6 +15,12 @@ It currently only supports integer arithmetic expressions and an interactive REP
 
 > 20 / 5 / 3
 1
+
+> -(2 + 3) * -5
+25
+
+> 1712 +-1729
+-17
 ```
 
 ## Architecture
@@ -37,6 +43,7 @@ The interpreter is currently split into these components:
 ## Features
 
 - Integer Literals
+- Unary `+` and `-` (i.e. the sign operators)
 - Addition and Subtraction
 - Multiplication and Integer Division
 - Parenthesized expressions
