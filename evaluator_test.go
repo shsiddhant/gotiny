@@ -1,6 +1,8 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestEval(t *testing.T) {
 	tests := []struct {
@@ -31,7 +33,9 @@ func TestEval(t *testing.T) {
 			t.Fatalf("%q: parse error: %v", tt.input, err)
 		}
 
-		got, err := Eval(expr)
+		env := NewEnvironment()
+
+		got, err := Eval(expr, env)
 		if err != nil {
 			t.Fatalf("%q: evaluation error: %v", tt.input, err)
 		}
@@ -48,8 +52,47 @@ func TestEvalDivisionByZero(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = Eval(expr)
+	env := NewEnvironment()
+
+	_, err = Eval(expr, env)
 	if err == nil {
 		t.Fatal("expected division by zero error")
+	}
+}
+
+func TestEvalVariable(t *testing.T) {
+	env := NewEnvironment()
+
+	value := 1712
+	expected := -17
+
+	env.Set("x", value)
+
+	expr, err := Parse("x + -1729")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := Eval(expr, env)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if got != expected {
+		t.Errorf("got %d, expected %d", got, expected)
+	}
+}
+
+func TestEvalUndefinedVariable(t *testing.T) {
+	env := NewEnvironment()
+
+	expr, err := Parse("x")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = Eval(expr, env)
+	if err == nil {
+		t.Fatal("expected undefined variable error")
 	}
 }

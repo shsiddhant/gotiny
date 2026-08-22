@@ -55,6 +55,14 @@ func (p *Parser) primary() (Expr, error) {
 		}
 		return expr, nil
 
+	case Identifier:
+		expr := &VariableExpr{Name: p.current}
+
+		if err := p.advance(); err != nil {
+			return nil, err
+		}
+		return expr, nil
+
 	case LeftParen:
 		if err := p.advance(); err != nil {
 			return nil, err

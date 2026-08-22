@@ -12,6 +12,8 @@ func (t TokenType) String() string {
 		return "EOF"
 	case Number:
 		return "Number"
+	case Identifier:
+		return "Identifier"
 	case Plus:
 		return "Plus"
 	case Minus:
@@ -33,6 +35,7 @@ const (
 	InvalidToken TokenType = iota
 	EOF
 	Number
+	Identifier
 	Plus
 	Minus
 	Star

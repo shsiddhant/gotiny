@@ -2,8 +2,8 @@ package main
 
 import "fmt"
 
-func evalUnary(expr *UnaryExpr) (int, error) {
-	operandEval, err := Eval(expr.Operand)
+func evalUnary(expr *UnaryExpr, env *Environment) (int, error) {
+	operandEval, err := Eval(expr.Operand, env)
 
 	if err != nil {
 		return 0, err
@@ -20,14 +20,14 @@ func evalUnary(expr *UnaryExpr) (int, error) {
 
 }
 
-func evalBinary(expr *BinaryExpr) (int, error) {
-	left, err := Eval(expr.Left)
+func evalBinary(expr *BinaryExpr, env *Environment) (int, error) {
+	left, err := Eval(expr.Left, env)
 
 	if err != nil {
 		return 0, err
 	}
 
-	right, err := Eval(expr.Right)
+	right, err := Eval(expr.Right, env)
 	if err != nil {
 		return 0, err
 	}
@@ -49,16 +49,18 @@ func evalBinary(expr *BinaryExpr) (int, error) {
 	}
 }
 
-func Eval(expr Expr) (int, error) {
+func Eval(expr Expr, env *Environment) (int, error) {
 	switch expr := expr.(type) {
 	case *LiteralExpr:
 		return expr.Value, nil
+	case *VariableExpr:
+		return env.Get(expr.Name.Value)
 	case *UnaryExpr:
-		return evalUnary(expr)
+		return evalUnary(expr, env)
 	case *BinaryExpr:
-		return evalBinary(expr)
+		return evalBinary(expr, env)
 	case *GroupExpr:
-		return Eval(expr.Expression)
+		return Eval(expr.Expression, env)
 	default:
 		return 0, fmt.Errorf("unknown expression type %T", expr)
 

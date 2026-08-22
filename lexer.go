@@ -55,6 +55,25 @@ func (l *Lexer) number() Token {
 	}
 }
 
+func isLetter(c rune) bool {
+	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'
+}
+
+func isIdentifierPart(c rune) bool {
+	return isLetter(c) || isDigit(c)
+}
+
+func (l *Lexer) identifier() Token {
+	for isIdentifierPart(l.peek()) {
+		l.advance()
+	}
+
+	return Token{
+		Type:  Identifier,
+		Value: string(l.source[l.start:l.current]),
+	}
+}
+
 func (l *Lexer) Next() (Token, error) {
 	l.skipWhitespace()
 	l.start = l.current
@@ -82,6 +101,10 @@ func (l *Lexer) Next() (Token, error) {
 
 	if isDigit(c) {
 		return l.number(), nil
+	}
+
+	if isLetter(c) {
+		return l.identifier(), nil
 	}
 
 	return Token{}, fmt.Errorf("unexpected character: %q", c)

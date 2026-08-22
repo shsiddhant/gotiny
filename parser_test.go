@@ -55,6 +55,10 @@ func TestParser(t *testing.T) {
 			input:    "20 / 5 / 2",
 			expected: "((20 / 5) / 2)",
 		},
+		{
+			input:    "-x + 2",
+			expected: "((-x) + 2)",
+		},
 	}
 
 	for _, tt := range tests {

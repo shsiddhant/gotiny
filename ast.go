@@ -14,6 +14,14 @@ func (e LiteralExpr) String() string {
 	return fmt.Sprintf("%d", e.Value)
 }
 
+type VariableExpr struct {
+	Name Token
+}
+
+func (e VariableExpr) String() string {
+	return e.Name.Value
+}
+
 type UnaryExpr struct {
 	Operator Token
 	Operand  Expr

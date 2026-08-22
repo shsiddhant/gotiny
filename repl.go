@@ -7,7 +7,9 @@ import (
 )
 
 func RunREPL() {
-scanner := bufio.NewScanner(os.Stdin)
+	scanner := bufio.NewScanner(os.Stdin)
+
+	env := NewEnvironment()
 
 	for {
 		fmt.Print("> ")
@@ -23,7 +25,7 @@ scanner := bufio.NewScanner(os.Stdin)
 			continue
 		}
 
-		result, err := Eval(expr)
+		result, err := Eval(expr, env)
 
 		if err != nil {
 			fmt.Println("Error:", err)
