@@ -21,6 +21,8 @@ const (
 	Slash
 	Equal
 
+	// Delimiters
+	SemiColon
 	LeftParen
 	RightParen
 )

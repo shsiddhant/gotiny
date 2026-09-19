@@ -94,6 +94,7 @@ func (l *Lexer) Next() (Token, error) {
 	c := l.advance()
 
 	switch c {
+	//Operators
 	case '+':
 		return Token{Type: Plus, Value: "+"}, nil
 	case '-':
@@ -104,6 +105,10 @@ func (l *Lexer) Next() (Token, error) {
 		return Token{Type: Slash, Value: "/"}, nil
 	case '=':
 		return Token{Type: Equal, Value: "="}, nil
+
+	// Delimiters
+	case ';':
+		return Token{Type: SemiColon, Value: ";"}, nil
 	case '(':
 		return Token{Type: LeftParen, Value: "("}, nil
 	case ')':

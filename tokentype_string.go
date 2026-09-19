@@ -18,13 +18,14 @@ func _() {
 	_ = x[Star-7]
 	_ = x[Slash-8]
 	_ = x[Equal-9]
-	_ = x[LeftParen-10]
-	_ = x[RightParen-11]
+	_ = x[SemiColon-10]
+	_ = x[LeftParen-11]
+	_ = x[RightParen-12]
 }
 
-const _TokenType_name = "InvalidTokenEOFNumberIdentifierLetPlusMinusStarSlashEqualLeftParenRightParen"
+const _TokenType_name = "InvalidTokenEOFNumberIdentifierLetPlusMinusStarSlashEqualSemiColonLeftParenRightParen"
 
-var _TokenType_index = [...]uint8{0, 12, 15, 21, 31, 34, 38, 43, 47, 52, 57, 66, 76}
+var _TokenType_index = [...]uint8{0, 12, 15, 21, 31, 34, 38, 43, 47, 52, 57, 66, 75, 85}
 
 func (i TokenType) String() string {
 	idx := int(i) - 0

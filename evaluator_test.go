@@ -9,22 +9,22 @@ func TestEval(t *testing.T) {
 		input    string
 		expected int
 	}{
-		{"1", 1},
-		{"-1", -1},
-		{"+1", 1},
-		{"--1", 1},
-		{"-+1", -1},
-		{"2 + -5", -3},
-		{"2 * -3", -6},
-		{"-2 * 3", -6},
-		{"-5 / 3", -1},
-		{"-(1 + 2)", -3},
-		{"1 + 2", 3},
-		{"2 * 3", 6},
-		{"1 + 2 * 3", 7},
-		{"(1 + 2) * 3", 9},
-		{"20 / 5 / 2", 2},
-		{"10 - 3 - 2", 5},
+		{"1;", 1},
+		{"-1;", -1},
+		{"+1;", 1},
+		{"--1;", 1},
+		{"-+1;", -1},
+		{"2 + -5;", -3},
+		{"2 * -3;", -6},
+		{"-2 * 3;", -6},
+		{"-5 / 3;", -1},
+		{"-(1 + 2);", -3},
+		{"1 + 2;", 3},
+		{"2 * 3;", 6},
+		{"1 + 2 * 3;", 7},
+		{"(1 + 2) * 3;", 9},
+		{"20 / 5 / 2;", 2},
+		{"10 - 3 - 2;", 5},
 	}
 
 	for _, tt := range tests {
@@ -47,7 +47,7 @@ func TestEval(t *testing.T) {
 }
 
 func TestEvalDivisionByZero(t *testing.T) {
-	stmt, err := Parse("10 / 0")
+	stmt, err := Parse("10 / 0;")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -68,7 +68,7 @@ func TestEvalVariable(t *testing.T) {
 
 	env.Set("x", value)
 
-	stmt, err := Parse("x + -1729")
+	stmt, err := Parse("x + -1729;")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -86,7 +86,7 @@ func TestEvalVariable(t *testing.T) {
 func TestEvalUndefinedVariable(t *testing.T) {
 	env := NewEnvironment()
 
-	stmt, err := Parse("x")
+	stmt, err := Parse("x;")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,7 +100,7 @@ func TestEvalUndefinedVariable(t *testing.T) {
 func TestEvalLetStmt(t *testing.T) {
 	env := NewEnvironment()
 
-	stmt, err := Parse("let x = 3")
+	stmt, err := Parse("let x = 3;")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -110,7 +110,7 @@ func TestEvalLetStmt(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	stmt2, err := Parse("x*x + 1")
+	stmt2, err := Parse("x*x + 1;")
 	if err != nil {
 		t.Fatal(err)
 	}

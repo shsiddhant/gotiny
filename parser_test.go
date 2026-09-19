@@ -8,63 +8,63 @@ func TestParser(t *testing.T) {
 		expected string
 	}{
 		{
-			input:    "1",
+			input:    "1;",
 			expected: "1",
 		},
 		{
-			input:    "-1",
+			input:    "-1;",
 			expected: "(-1)",
 		},
 		{
-			input:    "+1",
+			input:    "+1;",
 			expected: "(+1)",
 		},
 		{
-			input:    "--1",
+			input:    "--1;",
 			expected: "(-(-1))",
 		},
 		{
-			input:    "2 + -5",
+			input:    "2 + -5;",
 			expected: "(2 + (-5))",
 		},
 		{
-			input:    "2 * -3",
+			input:    "2 * -3;",
 			expected: "(2 * (-3))",
 		},
 		{
-			input:    "-2 * 3",
+			input:    "-2 * 3;",
 			expected: "((-2) * 3)",
 		},
 		{
-			input:    "-(1 + 2)",
+			input:    "-(1 + 2);",
 			expected: "(-(group (1 + 2)))",
 		},
 		{
-			input:    "1 + 2",
+			input:    "1 + 2;",
 			expected: "(1 + 2)",
 		},
 		{
-			input:    "1 + 2 * 3",
+			input:    "1 + 2 * 3;",
 			expected: "(1 + (2 * 3))",
 		},
 		{
-			input:    "(1 + 2) * 3",
+			input:    "(1 + 2) * 3;",
 			expected: "((group (1 + 2)) * 3)",
 		},
 		{
-			input:    "20 / 5 / 2",
+			input:    "20 / 5 / 2;",
 			expected: "((20 / 5) / 2)",
 		},
 		{
-			input:    "-x + 2",
+			input:    "-x + 2;",
 			expected: "((-x) + 2)",
 		},
 		{
-			input:    "let x = y + 2",
+			input:    "let x = y + 2;",
 			expected: "let x = (y + 2)",
 		},
 		{
-			input:    "let x = -y + 2",
+			input:    "let x = -y + 2;",
 			expected: "let x = ((-y) + 2)",
 		},
 	}

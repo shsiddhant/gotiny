@@ -3,7 +3,7 @@ package main
 import "testing"
 
 func TestLexer(t *testing.T) {
-	input := "let x = 123 + 4 * (2 - 1) - _tgb"
+	input := "let x = 123 + 4 * (2 - 1) - _tgb;"
 
 	lexer := NewLexer(input)
 
@@ -22,6 +22,7 @@ func TestLexer(t *testing.T) {
 		{Type: RightParen, Value: ")"},
 		{Type: Minus, Value: "-"},
 		{Type: Identifier, Value: "_tgb"},
+		{Type: SemiColon, Value: ";"},
 		{Type: EOF},
 	}
 

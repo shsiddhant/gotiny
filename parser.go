@@ -158,6 +158,14 @@ func (p *Parser) addition() (Expr, error) {
 	return expr, nil
 }
 
+func (p *Parser) exprStatement() (Stmt, error) {
+	expr, err := p.expression()
+	if err != nil {
+		return nil, err
+	}
+	return &ExprStmt{Expression: expr}, nil
+}
+
 func (p *Parser) letStatement() (Stmt, error) {
 	if err := p.consume(Let); err != nil {
 		return nil, err
@@ -181,14 +189,23 @@ func (p *Parser) letStatement() (Stmt, error) {
 }
 
 func (p *Parser) statement() (Stmt, error) {
-	if p.current.Type == Let {
-		return p.letStatement()
+	var stmt Stmt
+	var err error
+
+	switch p.current.Type {
+	case Let:
+		stmt, err = p.letStatement()
+	default:
+		stmt, err = p.exprStatement()
 	}
-	expr, err := p.expression()
 	if err != nil {
 		return nil, err
 	}
-	return &ExprStmt{Expression: expr}, nil
+	if err := p.consume(SemiColon); err != nil {
+		return nil, err
+	}
+
+	return stmt, err
 }
 
 func (p *Parser) Parse() (Stmt, error) {
