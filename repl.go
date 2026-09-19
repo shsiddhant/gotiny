@@ -18,14 +18,14 @@ func RunREPL() {
 		}
 		input := scanner.Text()
 
-		stmt, err := Parse(input)
+		program, err := Parse(input)
 
 		if err != nil {
 			fmt.Println("Error:", err)
 			continue
 		}
 
-		result, err := EvalStmt(stmt, env)
+		result, err := EvalProgram(program, env)
 
 		if err != nil {
 			fmt.Println("Error:", err)

@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Expr interface {
 	expr()
@@ -10,6 +12,22 @@ type Expr interface {
 type Stmt interface {
 	stmt()
 	String() string
+}
+
+type Program struct {
+	Statements []Stmt
+}
+
+func (p Program) String() string {
+	var s string
+	for i, stmt := range p.Statements {
+		if i != 0 {
+			s = s + "\n"
+		}
+		s += stmt.String() + ";"
+
+	}
+	return s
 }
 
 type ExprStmt struct {

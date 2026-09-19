@@ -1,6 +1,8 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestParser(t *testing.T) {
 	tests := []struct {
@@ -70,12 +72,12 @@ func TestParser(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		stmt, err := Parse(tt.input)
+		program, err := Parse(tt.input)
 		if err != nil {
 			t.Fatalf("%q: unexpected error: %v", tt.input, err)
 		}
 
-		got := stmt.String()
+		got := program.Statements[0].String()
 
 		if got != tt.expected {
 			t.Errorf("%q: got %q, expected %q", tt.input, got, tt.expected)
@@ -120,5 +122,36 @@ func TestParseExpressionWithLet(t *testing.T) {
 
 	if err == nil {
 		t.Fatal(err)
+	}
+}
+
+func TestParserProgram(t *testing.T) {
+
+	progString := `
+	let x =1712;
+	let y =-1729;
+	x-y;
+	`
+
+	expected := []string{
+		"let x = 1712",
+		"let y = (-1729)",
+		"(x - y)",
+	}
+
+	program, err := Parse(progString)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(program.Statements) != 3 {
+		t.Fatalf("got %d statements, expected 3", len(program.Statements))
+	}
+
+	for i, stmt := range program.Statements {
+		got := stmt.String()
+		if got != expected[i] {
+			t.Errorf("got %q, expected %q", got, expected[i])
+		}
 	}
 }

@@ -208,20 +208,22 @@ func (p *Parser) statement() (Stmt, error) {
 	return stmt, err
 }
 
-func (p *Parser) Parse() (Stmt, error) {
-	stmt, err := p.statement()
-	if err != nil {
-		return nil, err
+func (p *Parser) Parse() (*Program, error) {
+
+	program := &Program{}
+
+	for p.current.Type != EOF {
+		stmt, err := p.statement()
+		if err != nil {
+			return nil, err
+		}
+		program.Statements = append(program.Statements, stmt)
 	}
 
-	if p.current.Type != EOF {
-		return nil, fmt.Errorf("unexpected token: %s", p.current)
-	}
-
-	return stmt, nil
+	return program, nil
 }
 
-func Parse(source string) (Stmt, error) {
+func Parse(source string) (*Program, error) {
 	lexer := NewLexer(source)
 
 	parser, err := NewParser(lexer)

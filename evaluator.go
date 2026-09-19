@@ -87,3 +87,16 @@ func EvalStmt(stmt Stmt, env *Environment) (int, error) {
 		return 0, fmt.Errorf("unknown statement type %T", stmt)
 	}
 }
+
+func EvalProgram(program *Program, env *Environment) (int, error) {
+	var result int
+	var err error
+
+	for _, stmt := range program.Statements {
+		result, err = EvalStmt(stmt, env)
+		if err != nil {
+			return 0, err
+		}
+	}
+	return result, nil
+}
