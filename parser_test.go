@@ -62,12 +62,12 @@ func TestParser(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		expr, err := Parse(tt.input)
+		stmt, err := Parse(tt.input)
 		if err != nil {
 			t.Fatalf("%q: unexpected error: %v", tt.input, err)
 		}
 
-		got := expr.String()
+		got := stmt.String()
 
 		if got != tt.expected {
 			t.Errorf("%q: got %q, expected %q", tt.input, got, tt.expected)

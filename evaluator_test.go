@@ -28,14 +28,14 @@ func TestEval(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		expr, err := Parse(tt.input)
+		stmt, err := Parse(tt.input)
 		if err != nil {
 			t.Fatalf("%q: parse error: %v", tt.input, err)
 		}
 
 		env := NewEnvironment()
 
-		got, err := Eval(expr, env)
+		got, err := EvalStmt(stmt, env)
 		if err != nil {
 			t.Fatalf("%q: evaluation error: %v", tt.input, err)
 		}
@@ -47,14 +47,14 @@ func TestEval(t *testing.T) {
 }
 
 func TestEvalDivisionByZero(t *testing.T) {
-	expr, err := Parse("10 / 0")
+	stmt, err := Parse("10 / 0")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	env := NewEnvironment()
 
-	_, err = Eval(expr, env)
+	_, err = EvalStmt(stmt, env)
 	if err == nil {
 		t.Fatal("expected division by zero error")
 	}
@@ -68,12 +68,12 @@ func TestEvalVariable(t *testing.T) {
 
 	env.Set("x", value)
 
-	expr, err := Parse("x + -1729")
+	stmt, err := Parse("x + -1729")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	got, err := Eval(expr, env)
+	got, err := EvalStmt(stmt, env)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -86,12 +86,12 @@ func TestEvalVariable(t *testing.T) {
 func TestEvalUndefinedVariable(t *testing.T) {
 	env := NewEnvironment()
 
-	expr, err := Parse("x")
+	stmt, err := Parse("x")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = Eval(expr, env)
+	_, err = EvalStmt(stmt, env)
 	if err == nil {
 		t.Fatal("expected undefined variable error")
 	}

@@ -3,12 +3,30 @@ package main
 import "fmt"
 
 type Expr interface {
+	expr()
 	String() string
+}
+
+type Stmt interface {
+	stmt()
+	String() string
+}
+
+type ExprStmt struct {
+	Expression Expr
+}
+
+func (s ExprStmt) stmt() {}
+
+func (s ExprStmt) String() string {
+	return s.Expression.String()
 }
 
 type LiteralExpr struct {
 	Value int
 }
+
+func (e LiteralExpr) expr() {}
 
 func (e LiteralExpr) String() string {
 	return fmt.Sprintf("%d", e.Value)
@@ -18,6 +36,8 @@ type VariableExpr struct {
 	Name Token
 }
 
+func (e VariableExpr) expr() {}
+
 func (e VariableExpr) String() string {
 	return e.Name.Value
 }
@@ -26,6 +46,8 @@ type UnaryExpr struct {
 	Operator Token
 	Operand  Expr
 }
+
+func (e UnaryExpr) expr() {}
 
 func (e UnaryExpr) String() string {
 	return fmt.Sprintf("(%s%s)", e.Operator.Value, e.Operand)
@@ -37,6 +59,8 @@ type BinaryExpr struct {
 	Right    Expr
 }
 
+func (e BinaryExpr) expr() {}
+
 func (e BinaryExpr) String() string {
 	return fmt.Sprintf("(%s %s %s)", e.Left, e.Operator.Value, e.Right)
 }
@@ -44,6 +68,8 @@ func (e BinaryExpr) String() string {
 type GroupExpr struct {
 	Expression Expr
 }
+
+func (e GroupExpr) expr() {}
 
 func (e GroupExpr) String() string {
 	return fmt.Sprintf("(group %s)", e.Expression)

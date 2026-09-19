@@ -158,7 +158,7 @@ func (p *Parser) addition() (Expr, error) {
 	return expr, nil
 }
 
-func (p *Parser) Parse() (Expr, error) {
+func (p *Parser) Parse() (Stmt, error) {
 	expr, err := p.expression()
 	if err != nil {
 		return nil, err
@@ -168,10 +168,10 @@ func (p *Parser) Parse() (Expr, error) {
 		return nil, fmt.Errorf("unexpected token: %s", p.current)
 	}
 
-	return expr, nil
+	return &ExprStmt{Expression: expr}, nil
 }
 
-func Parse(source string) (Expr, error) {
+func Parse(source string) (Stmt, error) {
 	lexer := NewLexer(source)
 
 	parser, err := NewParser(lexer)
