@@ -62,3 +62,39 @@ func TestLexerUnexpectedCharacter(t *testing.T) {
 		t.Fatal("expected error")
 	}
 }
+
+func TestLexerKeywords(t *testing.T) {
+	lexer := NewLexer("let x = true;")
+
+	expected := []Token{
+		{Let, "let"},
+		{Identifier, "x"},
+		{Equal, "="},
+		{True, "true"},
+		{SemiColon, ";"},
+		{Type: EOF},
+	}
+
+	for i := 0; ; i++ {
+		got, err := lexer.Next()
+		if err != nil {
+			t.Fatalf("token %d: unexpected error: %v", i, err)
+		}
+
+		if i >= len(expected) {
+			t.Fatalf("lexer produced unexpected token: %v", got)
+		}
+
+		if got != expected[i] {
+			t.Errorf("token %d: got %v, expected %v", i, got, expected[i])
+		}
+
+		if got.Type == EOF {
+			if i != len(expected)-1 {
+				t.Errorf("lexer reached EOF early: got %d tokens, expected %d", i+1, len(expected))
+			}
+			break
+		}
+	}
+
+}

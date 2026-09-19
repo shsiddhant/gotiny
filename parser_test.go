@@ -69,6 +69,10 @@ func TestParser(t *testing.T) {
 			input:    "let x = -y + 2;",
 			expected: "let x = ((-y) + 2)",
 		},
+		{
+			input:    "let x = true;",
+			expected: "let x = true",
+		},
 	}
 
 	for _, tt := range tests {

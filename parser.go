@@ -48,8 +48,22 @@ func (p *Parser) primary() (Expr, error) {
 			return nil, err
 		}
 
-		expr := &LiteralExpr{Value: value}
+		expr := &LiteralExpr{Value: Int(value)}
 
+		if err := p.advance(); err != nil {
+			return nil, err
+		}
+		return expr, nil
+
+	case True:
+		expr := &LiteralExpr{Value: Bool(true)}
+		if err := p.advance(); err != nil {
+			return nil, err
+		}
+		return expr, nil
+
+	case False:
+		expr := &LiteralExpr{Value: Bool(false)}
 		if err := p.advance(); err != nil {
 			return nil, err
 		}

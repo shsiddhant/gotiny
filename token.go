@@ -13,6 +13,8 @@ const (
 
 	// Keywords
 	Let
+	True
+	False
 
 	// Operators
 	Plus
@@ -37,5 +39,7 @@ func (token Token) String() string {
 }
 
 var keywords = map[string]TokenType{
-	"let": Let,
+	"let":   Let,
+	"true":  True,
+	"false": False,
 }

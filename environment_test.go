@@ -7,7 +7,7 @@ import (
 func TestEnvironmentSetGet(t *testing.T) {
 	env := NewEnvironment()
 
-	value := 1712
+	value := Int(1712)
 
 	env.Set("x", value)
 
@@ -24,9 +24,9 @@ func TestEnvironmentSetGet(t *testing.T) {
 func TestEnvironmentSetExisting(t *testing.T) {
 	env := NewEnvironment()
 
-	old := 1712
+	old := Int(1712)
 
-	new := 2412
+	new := Int(2412)
 
 	env.Set("x", old)
 	env.Set("x", new)
@@ -44,7 +44,7 @@ func TestEnvironmentSetExisting(t *testing.T) {
 func TestEnvironmentDefine(t *testing.T) {
 	env := NewEnvironment()
 
-	name, value := "x", 1712
+	name, value := "x", Int(1712)
 
 	if err := env.Define(name, value); err != nil {
 		t.Fatal(err)
@@ -62,13 +62,13 @@ func TestEnvironmentDefine(t *testing.T) {
 func TestEnvironmentAlreadyDefined(t *testing.T) {
 	env := NewEnvironment()
 
-	name, value := "x", 1712
+	name, value := "x", Int(1712)
 
 	if err := env.Define(name, value); err != nil {
 		t.Fatal(err)
 	}
 
-	if err := env.Define(name, 1205); err == nil {
+	if err := env.Define(name, Int(1205)); err == nil {
 		t.Fatal("expected error")
 	}
 }

@@ -7,24 +7,24 @@ import (
 func TestEval(t *testing.T) {
 	tests := []struct {
 		input    string
-		expected int
+		expected Value
 	}{
-		{"1;", 1},
-		{"-1;", -1},
-		{"+1;", 1},
-		{"--1;", 1},
-		{"-+1;", -1},
-		{"2 + -5;", -3},
-		{"2 * -3;", -6},
-		{"-2 * 3;", -6},
-		{"-5 / 3;", -1},
-		{"-(1 + 2);", -3},
-		{"1 + 2;", 3},
-		{"2 * 3;", 6},
-		{"1 + 2 * 3;", 7},
-		{"(1 + 2) * 3;", 9},
-		{"20 / 5 / 2;", 2},
-		{"10 - 3 - 2;", 5},
+		{"1;", Int(1)},
+		{"-1;", Int(-1)},
+		{"+1;", Int(1)},
+		{"--1;", Int(1)},
+		{"-+1;", Int(-1)},
+		{"2 + -5;", Int(-3)},
+		{"2 * -3;", Int(-6)},
+		{"-2 * 3;", Int(-6)},
+		{"-5 / 3;", Int(-1)},
+		{"-(1 + 2);", Int(-3)},
+		{"1 + 2;", Int(3)},
+		{"2 * 3;", Int(6)},
+		{"1 + 2 * 3;", Int(7)},
+		{"(1 + 2) * 3;", Int(9)},
+		{"20 / 5 / 2;", Int(2)},
+		{"10 - 3 - 2;", Int(5)},
 	}
 
 	for _, tt := range tests {
@@ -63,8 +63,8 @@ func TestEvalDivisionByZero(t *testing.T) {
 func TestEvalVariable(t *testing.T) {
 	env := NewEnvironment()
 
-	value := 1712
-	expected := -17
+	value := Int(1712)
+	expected := Int(-17)
 
 	env.Set("x", value)
 
@@ -120,7 +120,7 @@ func TestEvalLetStmt(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if got != 10 {
+	if got != Int(10) {
 		t.Errorf("%q: got %d, expected %d", program2, got, 10)
 	}
 }
@@ -142,7 +142,7 @@ func TestEvalProgram(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if got != -17 {
+	if got != Int(-17) {
 		t.Errorf("got %d, expected -17", got)
 	}
 
@@ -151,7 +151,7 @@ func TestEvalProgram(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if x != 1712 {
+	if x != Int(1712) {
 		t.Errorf("x = %d, expected 1712", x)
 	}
 
@@ -160,7 +160,7 @@ func TestEvalProgram(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if y != -1729 {
+	if y != Int(-1729) {
 		t.Errorf("x = %d, expected -1729", y)
 	}
 
@@ -183,7 +183,7 @@ func TestEvalProgramUsesPreviousStatements(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if got != -17 {
+	if got != Int(-17) {
 		t.Errorf("got %d, expected -17", got)
 	}
 }
@@ -199,7 +199,29 @@ func TestEvalEmptyProgram(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if got != 0 {
-		t.Errorf("got %d, expected 0", got)
+	if got != nil {
+		t.Errorf("got %v, expected nil", got)
+	}
+}
+
+func TestEvalTypeErrors(t *testing.T) {
+	tests := []string{
+		"true + 1;",
+		"1 + true;",
+		"true + false;",
+		"-true;",
+		"+false;",
+	}
+
+	for _, input := range tests {
+		program, err := Parse(input)
+		if err != nil {
+			t.Fatalf("%q: parse error: %v", input, err)
+		}
+
+		_, err = EvalProgram(program, NewEnvironment())
+		if err == nil {
+			t.Errorf("%q: expected evaluation error", input)
+		}
 	}
 }

@@ -52,13 +52,13 @@ func (s LetStmt) String() string {
 }
 
 type LiteralExpr struct {
-	Value int
+	Value Value
 }
 
 func (e LiteralExpr) expr() {}
 
 func (e LiteralExpr) String() string {
-	return fmt.Sprintf("%d", e.Value)
+	return e.Value.String()
 }
 
 type VariableExpr struct {
