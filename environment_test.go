@@ -40,3 +40,35 @@ func TestEnvironmentSetExisting(t *testing.T) {
 		t.Errorf("got %d, expected %d", got, new)
 	}
 }
+
+func TestEnvironmentDefine(t *testing.T) {
+	env := NewEnvironment()
+
+	name, value := "x", 1712
+
+	if err := env.Define(name, value); err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := env.Get(name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got != value {
+		t.Errorf("got %d, expected %d", got, value)
+	}
+}
+
+func TestEnvironmentAlreadyDefined(t *testing.T) {
+	env := NewEnvironment()
+
+	name, value := "x", 1712
+
+	if err := env.Define(name, value); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := env.Define(name, 1205); err == nil {
+		t.Fatal("expected error")
+	}
+}

@@ -3,11 +3,14 @@ package main
 import "testing"
 
 func TestLexer(t *testing.T) {
-	input := "123 + 4 * (2 - 1) - _tgb"
+	input := "let x = 123 + 4 * (2 - 1) - _tgb"
 
 	lexer := NewLexer(input)
 
 	expected := []Token{
+		{Type: Let, Value: "let"},
+		{Type: Identifier, Value: "x"},
+		{Type: Equal, Value: "="},
 		{Type: Number, Value: "123"},
 		{Type: Plus, Value: "+"},
 		{Type: Number, Value: "4"},

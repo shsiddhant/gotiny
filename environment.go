@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Environment struct {
 	values map[string]int
@@ -21,4 +23,12 @@ func (e *Environment) Get(name string) (int, error) {
 
 func (e *Environment) Set(name string, value int) {
 	e.values[name] = value
+}
+
+func (e *Environment) Define(name string, value int) error {
+	if _, exists := e.values[name]; exists {
+		return fmt.Errorf("variable %s already defined", name)
+	}
+	e.values[name] = value
+	return nil
 }

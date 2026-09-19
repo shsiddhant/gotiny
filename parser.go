@@ -158,8 +158,41 @@ func (p *Parser) addition() (Expr, error) {
 	return expr, nil
 }
 
-func (p *Parser) Parse() (Stmt, error) {
+func (p *Parser) letStatement() (Stmt, error) {
+	if err := p.consume(Let); err != nil {
+		return nil, err
+	}
+	name := p.current.Value
+	if err := p.consume(Identifier); err != nil {
+		return nil, err
+	}
+	if err := p.consume(Equal); err != nil {
+		return nil, err
+	}
+	value, err := p.expression()
+	if err != nil {
+		return nil, err
+	}
+
+	return &LetStmt{
+		Name:  name,
+		Value: value,
+	}, nil
+}
+
+func (p *Parser) statement() (Stmt, error) {
+	if p.current.Type == Let {
+		return p.letStatement()
+	}
 	expr, err := p.expression()
+	if err != nil {
+		return nil, err
+	}
+	return &ExprStmt{Expression: expr}, nil
+}
+
+func (p *Parser) Parse() (Stmt, error) {
+	stmt, err := p.statement()
 	if err != nil {
 		return nil, err
 	}
@@ -168,7 +201,7 @@ func (p *Parser) Parse() (Stmt, error) {
 		return nil, fmt.Errorf("unexpected token: %s", p.current)
 	}
 
-	return &ExprStmt{Expression: expr}, nil
+	return stmt, nil
 }
 
 func Parse(source string) (Stmt, error) {

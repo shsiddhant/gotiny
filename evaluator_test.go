@@ -96,3 +96,31 @@ func TestEvalUndefinedVariable(t *testing.T) {
 		t.Fatal("expected undefined variable error")
 	}
 }
+
+func TestEvalLetStmt(t *testing.T) {
+	env := NewEnvironment()
+
+	stmt, err := Parse("let x = 3")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = EvalStmt(stmt, env)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	stmt2, err := Parse("x*x + 1")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := EvalStmt(stmt2, env)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if got != 10 {
+		t.Errorf("%q: got %d, expected %d", stmt2, got, 10)
+	}
+}

@@ -67,11 +67,22 @@ func EvalExpr(expr Expr, env *Environment) (int, error) {
 	}
 }
 
+func evalLetStmt(stmt *LetStmt, env *Environment) (int, error) {
+	value, err := EvalExpr(stmt.Value, env)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return 0, env.Define(stmt.Name, value)
+}
+
 func EvalStmt(stmt Stmt, env *Environment) (int, error) {
 	switch stmt := stmt.(type) {
 	case *ExprStmt:
 		return EvalExpr(stmt.Expression, env)
-
+	case *LetStmt:
+		return evalLetStmt(stmt, env)
 	default:
 		return 0, fmt.Errorf("unknown statement type %T", stmt)
 	}

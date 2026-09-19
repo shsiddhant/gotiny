@@ -59,6 +59,14 @@ func TestParser(t *testing.T) {
 			input:    "-x + 2",
 			expected: "((-x) + 2)",
 		},
+		{
+			input:    "let x = y + 2",
+			expected: "let x = (y + 2)",
+		},
+		{
+			input:    "let x = -y + 2",
+			expected: "let x = ((-y) + 2)",
+		},
 	}
 
 	for _, tt := range tests {
@@ -96,5 +104,21 @@ func TestParserRejectsUnclosedGrouping(t *testing.T) {
 
 	if err == nil {
 		t.Fatal("expected error")
+	}
+}
+
+func TestParserRejectsNestedLet(t *testing.T) {
+	_, err := Parse("let x = let y = 2")
+
+	if err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestParseExpressionWithLet(t *testing.T) {
+	_, err := Parse("1712 + let x = 1729")
+
+	if err == nil {
+		t.Fatal(err)
 	}
 }

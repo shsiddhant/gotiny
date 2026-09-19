@@ -63,14 +63,23 @@ func isIdentifierPart(c rune) bool {
 	return isLetter(c) || isDigit(c)
 }
 
-func (l *Lexer) identifier() Token {
+func (l *Lexer) identifierOrKeyword() Token {
 	for isIdentifierPart(l.peek()) {
 		l.advance()
 	}
 
+	value := string(l.source[l.start:l.current])
+
+	if tokenType, ok := keywords[value]; ok {
+		return Token{
+			Type:  tokenType,
+			Value: value,
+		}
+	}
+
 	return Token{
 		Type:  Identifier,
-		Value: string(l.source[l.start:l.current]),
+		Value: value,
 	}
 }
 
@@ -93,6 +102,8 @@ func (l *Lexer) Next() (Token, error) {
 		return Token{Type: Star, Value: "*"}, nil
 	case '/':
 		return Token{Type: Slash, Value: "/"}, nil
+	case '=':
+		return Token{Type: Equal, Value: "="}, nil
 	case '(':
 		return Token{Type: LeftParen, Value: "("}, nil
 	case ')':
@@ -104,7 +115,7 @@ func (l *Lexer) Next() (Token, error) {
 	}
 
 	if isLetter(c) {
-		return l.identifier(), nil
+		return l.identifierOrKeyword(), nil
 	}
 
 	return Token{}, fmt.Errorf("unexpected character: %q", c)

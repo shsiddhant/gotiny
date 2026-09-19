@@ -22,6 +22,17 @@ func (s ExprStmt) String() string {
 	return s.Expression.String()
 }
 
+type LetStmt struct {
+	Name  string
+	Value Expr
+}
+
+func (s LetStmt) stmt() {}
+
+func (s LetStmt) String() string {
+	return fmt.Sprintf("let %s = %s", s.Name, s.Value)
+}
+
 type LiteralExpr struct {
 	Value int
 }
