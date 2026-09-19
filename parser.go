@@ -8,21 +8,28 @@ import (
 type Parser struct {
 	lexer   *Lexer
 	current Token
+	peek    Token
 }
 
 func (p *Parser) advance() error {
+	p.current = p.peek
+
 	token, err := p.lexer.Next()
 	if err != nil {
 		return err
 	}
 
-	p.current = token
+	p.peek = token
 	return nil
 }
 
 func NewParser(lexer *Lexer) (*Parser, error) {
 	p := &Parser{lexer: lexer}
 
+	// advance twice to initialize both current and peek.
+	if err := p.advance(); err != nil {
+		return nil, err
+	}
 	if err := p.advance(); err != nil {
 		return nil, err
 	}
@@ -180,6 +187,25 @@ func (p *Parser) exprStatement() (Stmt, error) {
 	return &ExprStmt{Expression: expr}, nil
 }
 
+func (p *Parser) assignStatement() (Stmt, error) {
+	name := p.current.Value
+	if err := p.consume(Identifier); err != nil {
+		return nil, err
+	}
+	if err := p.consume(Equal); err != nil {
+		return nil, err
+	}
+	value, err := p.expression()
+	if err != nil {
+		return nil, err
+	}
+
+	return &AssignStmt{
+		Name:  name,
+		Value: value,
+	}, nil
+}
+
 func (p *Parser) letStatement() (Stmt, error) {
 	if err := p.consume(Let); err != nil {
 		return nil, err
@@ -206,9 +232,11 @@ func (p *Parser) statement() (Stmt, error) {
 	var stmt Stmt
 	var err error
 
-	switch p.current.Type {
-	case Let:
+	switch {
+	case p.current.Type == Let:
 		stmt, err = p.letStatement()
+	case p.current.Type == Identifier && p.peek.Type == Equal:
+		stmt, err = p.assignStatement()
 	default:
 		stmt, err = p.exprStatement()
 	}

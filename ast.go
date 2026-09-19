@@ -40,6 +40,17 @@ func (s ExprStmt) String() string {
 	return s.Expression.String()
 }
 
+type AssignStmt struct {
+	Name  string
+	Value Expr
+}
+
+func (s AssignStmt) stmt() {}
+
+func (s AssignStmt) String() string {
+	return fmt.Sprintf("%s = %s", s.Name, s.Value)
+}
+
 type LetStmt struct {
 	Name  string
 	Value Expr

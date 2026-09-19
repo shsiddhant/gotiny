@@ -129,6 +129,7 @@ func TestEvalProgram(t *testing.T) {
 	program, err := Parse(`
 	let x = 1712;
 	let y = -1729;
+	y = x + 2 * y;
 	x + y;
 	`)
 	if err != nil {
@@ -142,8 +143,8 @@ func TestEvalProgram(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if got != Int(-17) {
-		t.Errorf("got %d, expected -17", got)
+	if got != Int(-34) {
+		t.Errorf("got %d, expected -34", got)
 	}
 
 	x, err := env.Get("x")
@@ -160,8 +161,8 @@ func TestEvalProgram(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if y != Int(-1729) {
-		t.Errorf("x = %d, expected -1729", y)
+	if y != Int(-1746) {
+		t.Errorf("x = %d, expected -1746", y)
 	}
 
 }

@@ -73,6 +73,10 @@ func TestParser(t *testing.T) {
 			input:    "let x = true;",
 			expected: "let x = true",
 		},
+		{
+			input:    "x = true;",
+			expected: "x = true",
+		},
 	}
 
 	for _, tt := range tests {

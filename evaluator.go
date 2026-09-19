@@ -84,6 +84,16 @@ func EvalExpr(expr Expr, env *Environment) (Value, error) {
 	}
 }
 
+func evalAssignStmt(stmt *AssignStmt, env *Environment) (Value, error) {
+	value, err := EvalExpr(stmt.Value, env)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, env.Assign(stmt.Name, value)
+}
+
 func evalLetStmt(stmt *LetStmt, env *Environment) (Value, error) {
 	value, err := EvalExpr(stmt.Value, env)
 
@@ -98,6 +108,8 @@ func EvalStmt(stmt Stmt, env *Environment) (Value, error) {
 	switch stmt := stmt.(type) {
 	case *ExprStmt:
 		return EvalExpr(stmt.Expression, env)
+	case *AssignStmt:
+		return evalAssignStmt(stmt, env)
 	case *LetStmt:
 		return evalLetStmt(stmt, env)
 	default:

@@ -25,18 +25,49 @@ It currently only supports integer arithmetic expressions, variable declarations
 
 ```
 > let x = 1712;
-0
+<nil>
 > let y = -1729;
-0
+<nil>
 > x + y;
 -17
-> let y = 1729;
-Error: variable y already defined
-> x + z;
-Error: undefined variable: z
+> x = 1729;
+<nil>
+> x + y;
+0
+> y = y + 1205; y;
+-524
 ```
 
 A variable must be declared before it can be used. Variables cannot currently be reassigned.
+
+```
+> let x = 1729;
+<nil>
+> let x = 1712;
+Error: variable x already defined
+> z = 10;
+Error: undefined variable: z
+```
+
+Variables cannot be assigned a value of a different type.
+
+```
+> let x = true; x;
+true
+> x = 1712;
+Error: cannot assign IntType value to BoolType variable
+```
+
+Cannot use the arithmetic operations with BoolType.
+
+```
+> let x = true; x;
+true
+> x + 1712;
+Error: binary operator "+" cannot be applied to BoolType and IntType
+> -x;
+Error: unary operator "-" cannot be applied to BoolType
+```
 
 ### 3. Multiple Statements
 
@@ -72,6 +103,7 @@ The interpreter is currently split into these components:
 - Parenthesized expressions
 - Operator precedence
 - Variable declarations with `let`
+- Variable assignment with type checking
 - Duplicate variable handling
 - Multiple statements
 - Interactive REPL
