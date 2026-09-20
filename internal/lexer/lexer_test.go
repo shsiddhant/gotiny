@@ -151,3 +151,55 @@ y - x;`
 		}
 	}
 }
+
+func TestLexerComparison(t *testing.T) {
+	lexer := NewLexer(`x>=1712
+y===1205
+1 != 3
+!==
+a > b
+> =`)
+
+	expected := []token.Token{
+		{Type: token.Identifier, Value: "x", Line: 1, Column: 1},
+		{Type: token.GreaterEqual, Value: ">=", Line: 1, Column: 2},
+		{Type: token.Number, Value: "1712", Line: 1, Column: 4},
+		{Type: token.Identifier, Value: "y", Line: 2, Column: 1},
+		{Type: token.EqualEqual, Value: "==", Line: 2, Column: 2},
+		{Type: token.Equal, Value: "=", Line: 2, Column: 4},
+		{Type: token.Number, Value: "1205", Line: 2, Column: 5},
+		{Type: token.Number, Value: "1", Line: 3, Column: 1},
+		{Type: token.NotEqual, Value: "!=", Line: 3, Column: 3},
+		{Type: token.Number, Value: "3", Line: 3, Column: 6},
+		{Type: token.NotEqual, Value: "!=", Line: 4, Column: 1},
+		{Type: token.Equal, Value: "=", Line: 4, Column: 3},
+		{Type: token.Identifier, Value: "a", Line: 5, Column: 1},
+		{Type: token.Greater, Value: ">", Line: 5, Column: 3},
+		{Type: token.Identifier, Value: "b", Line: 5, Column: 5},
+		{Type: token.Greater, Value: ">", Line: 6, Column: 1},
+		{Type: token.Equal, Value: "=", Line: 6, Column: 3},
+		{Type: token.EOF, Line: 6, Column: 4},
+	}
+
+	for i := 0; ; i++ {
+		got, err := lexer.Next()
+		if err != nil {
+			t.Fatalf("token %d: unexpected error: %v", i, err)
+		}
+
+		if i >= len(expected) {
+			t.Fatalf("lexer produced unexpected token: %v", got)
+		}
+
+		if got != expected[i] {
+			t.Errorf("token %d: got %v, expected %v", i, got, expected[i])
+		}
+
+		if got.Type == token.EOF {
+			if i != len(expected)-1 {
+				t.Errorf("lexer reached EOF early: got %d tokens, expected %d", i+1, len(expected))
+			}
+			break
+		}
+	}
+}

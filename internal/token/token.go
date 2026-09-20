@@ -19,18 +19,35 @@ const (
 	Else
 
 	// Operators
-	Plus
-	Minus
-	Star
-	Slash
-	Equal
+
+	// Arithmetic
+	Plus  // +
+	Minus // -
+	Star  // *
+	Slash // /
+
+	// Assign
+	Equal // =
+
+	// Comparison
+	Less         // <
+	LessEqual    // <=
+	Greater      // >
+	GreaterEqual // >=
+
+	// Equality
+	EqualEqual // ==
+	NotEqual   // !=
+
+	// Not
+	Not // !
 
 	// Delimiters
-	SemiColon
-	LeftParen
-	RightParen
-	LeftCurlyBrace
-	RightCurlyBrace
+	SemiColon       // ;
+	LeftParen       // (
+	RightParen      // )
+	LeftCurlyBrace  // {
+	RightCurlyBrace // }
 )
 
 type Token struct {

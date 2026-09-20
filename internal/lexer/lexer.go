@@ -123,7 +123,29 @@ func (l *Lexer) Next() (token.Token, error) {
 	case '/':
 		return token.Token{Type: token.Slash, Value: "/", Line: line, Column: column}, nil
 	case '=':
+		if l.peek() == '=' {
+			l.advance()
+			return token.Token{Type: token.EqualEqual, Value: "==", Line: line, Column: column}, nil
+		}
 		return token.Token{Type: token.Equal, Value: "=", Line: line, Column: column}, nil
+	case '>':
+		if l.peek() == '=' {
+			l.advance()
+			return token.Token{Type: token.GreaterEqual, Value: ">=", Line: line, Column: column}, nil
+		}
+		return token.Token{Type: token.Greater, Value: ">", Line: line, Column: column}, nil
+	case '<':
+		if l.peek() == '=' {
+			l.advance()
+			return token.Token{Type: token.LessEqual, Value: "<=", Line: line, Column: column}, nil
+		}
+		return token.Token{Type: token.Less, Value: "<", Line: line, Column: column}, nil
+	case '!':
+		if l.peek() == '=' {
+			l.advance()
+			return token.Token{Type: token.NotEqual, Value: "!=", Line: line, Column: column}, nil
+		}
+		return token.Token{Type: token.Not, Value: "!", Line: line, Column: column}, nil
 
 	// Delimiters
 	case ';':
