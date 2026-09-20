@@ -15,6 +15,8 @@ const (
 	Let
 	True
 	False
+	If
+	Else
 
 	// Operators
 	Plus
@@ -27,6 +29,8 @@ const (
 	SemiColon
 	LeftParen
 	RightParen
+	LeftCurlyBrace
+	RightCurlyBrace
 )
 
 type Token struct {
@@ -42,4 +46,6 @@ var keywords = map[string]TokenType{
 	"let":   Let,
 	"true":  True,
 	"false": False,
+	"if":    If,
+	"else":  Else,
 }

@@ -62,6 +62,38 @@ func (s LetStmt) String() string {
 	return fmt.Sprintf("let %s = %s", s.Name, s.Value)
 }
 
+type BlockStmt struct {
+	Statements []Stmt
+}
+
+func (s BlockStmt) stmt() {}
+
+func (s BlockStmt) String() string {
+	str := "{\n"
+	for _, stmt := range s.Statements {
+		if stmt != nil {
+			str = str + "  " + stmt.String() + ";\n"
+		}
+	}
+	return str + "}"
+}
+
+type IfStmt struct {
+	Cond Expr
+	Body *BlockStmt
+	Else *BlockStmt
+}
+
+func (s IfStmt) stmt() {}
+
+func (s IfStmt) String() string {
+	str := "if " + s.Cond.String() + " " + s.Body.String()
+	if s.Else != nil {
+		str += " else" + s.Else.String()
+	}
+	return str
+}
+
 type LiteralExpr struct {
 	Value Value
 }

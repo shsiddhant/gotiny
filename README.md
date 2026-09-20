@@ -38,7 +38,7 @@ It currently only supports integer arithmetic expressions, variable declarations
 -524
 ```
 
-A variable must be declared before it can be used. Variables cannot currently be reassigned.
+A variable must be declared before it can be used. Variables cannot be redeclared.
 
 ```
 > let x = 1729;

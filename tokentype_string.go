@@ -15,19 +15,23 @@ func _() {
 	_ = x[Let-4]
 	_ = x[True-5]
 	_ = x[False-6]
-	_ = x[Plus-7]
-	_ = x[Minus-8]
-	_ = x[Star-9]
-	_ = x[Slash-10]
-	_ = x[Equal-11]
-	_ = x[SemiColon-12]
-	_ = x[LeftParen-13]
-	_ = x[RightParen-14]
+	_ = x[If-7]
+	_ = x[Else-8]
+	_ = x[Plus-9]
+	_ = x[Minus-10]
+	_ = x[Star-11]
+	_ = x[Slash-12]
+	_ = x[Equal-13]
+	_ = x[SemiColon-14]
+	_ = x[LeftParen-15]
+	_ = x[RightParen-16]
+	_ = x[LeftCurlyBrace-17]
+	_ = x[RightCurlyBrace-18]
 }
 
-const _TokenType_name = "InvalidTokenEOFNumberIdentifierLetTrueFalsePlusMinusStarSlashEqualSemiColonLeftParenRightParen"
+const _TokenType_name = "InvalidTokenEOFNumberIdentifierLetTrueFalseIfElsePlusMinusStarSlashEqualSemiColonLeftParenRightParenLeftCurlyBraceRightCurlyBrace"
 
-var _TokenType_index = [...]uint8{0, 12, 15, 21, 31, 34, 38, 43, 47, 52, 56, 61, 66, 75, 84, 94}
+var _TokenType_index = [...]uint8{0, 12, 15, 21, 31, 34, 38, 43, 45, 49, 53, 58, 62, 67, 72, 81, 90, 100, 114, 129}
 
 func (i TokenType) String() string {
 	idx := int(i) - 0

@@ -113,6 +113,10 @@ func (l *Lexer) Next() (Token, error) {
 		return Token{Type: LeftParen, Value: "("}, nil
 	case ')':
 		return Token{Type: RightParen, Value: ")"}, nil
+	case '{':
+		return Token{Type: LeftCurlyBrace, Value: "{"}, nil
+	case '}':
+		return Token{Type: RightCurlyBrace, Value: "}"}, nil
 	}
 
 	if isDigit(c) {

@@ -228,6 +228,54 @@ func (p *Parser) letStatement() (Stmt, error) {
 	}, nil
 }
 
+func (p *Parser) block() (*BlockStmt, error) {
+	if err := p.consume(LeftCurlyBrace); err != nil {
+		return nil, err
+	}
+	block := &BlockStmt{}
+
+	for p.current.Type != RightCurlyBrace {
+		stmt, err := p.statement()
+		if err != nil {
+			return nil, err
+		}
+		block.Statements = append(block.Statements, stmt)
+	}
+	if err := p.consume(RightCurlyBrace); err != nil {
+		return nil, err
+	}
+	return block, nil
+}
+
+func (p *Parser) ifStatement() (Stmt, error) {
+	if err := p.consume(If); err != nil {
+		return nil, err
+	}
+	cond, err := p.expression()
+	if err != nil {
+		return nil, err
+	}
+	body, err := p.block()
+	if err != nil {
+		return nil, err
+	}
+	var elseblock *BlockStmt
+	if p.current.Type == Else {
+		if err := p.advance(); err != nil {
+			return nil, err
+		}
+		elseblock, err = p.block()
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &IfStmt{
+		Cond: cond,
+		Body: body,
+		Else: elseblock,
+	}, nil
+}
+
 func (p *Parser) statement() (Stmt, error) {
 	var stmt Stmt
 	var err error
@@ -235,6 +283,8 @@ func (p *Parser) statement() (Stmt, error) {
 	switch {
 	case p.current.Type == Let:
 		stmt, err = p.letStatement()
+	case p.current.Type == If:
+		return p.ifStatement()
 	case p.current.Type == Identifier && p.peek.Type == Equal:
 		stmt, err = p.assignStatement()
 	default:

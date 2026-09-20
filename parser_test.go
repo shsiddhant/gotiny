@@ -163,3 +163,168 @@ func TestParserProgram(t *testing.T) {
 		}
 	}
 }
+
+func TestParserIfStmt(t *testing.T) {
+	progString := `
+	if x {
+		x = 1712;
+		x;
+	} else {
+		x = 1729;
+		x - 1712;
+	}
+	`
+	program, err := Parse(progString)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(program.Statements) != 1 {
+		t.Fatalf("got %d statements, expected 1", len(program.Statements))
+	}
+
+	ifStmt, ok := program.Statements[0].(*IfStmt)
+	if !ok {
+		t.Fatal("expected an if statement")
+	}
+	if ifStmt.Cond.String() != "x" {
+		t.Fatalf("got %s, expected x", ifStmt.Cond.String())
+	}
+	body := ifStmt.Body
+	if len(body.Statements) != 2 {
+		t.Fatalf("got %d statements, expected 2", len(body.Statements))
+	}
+	expectedBody := []string{
+		"x = 1712",
+		"x",
+	}
+	for i, got := range body.Statements {
+		if got.String() != expectedBody[i] {
+			t.Fatalf("got %q, expected %q", got, expectedBody[i])
+		}
+	}
+	elseBlock := ifStmt.Else
+	if elseBlock == nil {
+		t.Fatal("expected else block, got nil")
+	}
+	expectedElse := []string{
+		"x = 1729",
+		"(x - 1712)",
+	}
+	if len(elseBlock.Statements) != 2 {
+		t.Fatalf("got %d statements, expected 2", len(elseBlock.Statements))
+	}
+	for i, got := range elseBlock.Statements {
+		if got.String() != expectedElse[i] {
+			t.Fatalf("got %q, expected %q", got, expectedElse[i])
+		}
+	}
+}
+
+func TestParserNestedIfStmt(t *testing.T) {
+	progString := `
+    if x {
+        if y {
+            x = 1;
+        }
+    }
+    `
+	program, err := Parse(progString)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(program.Statements) != 1 {
+		t.Fatalf("got %d statements, expected 1", len(program.Statements))
+	}
+
+	ifStmt, ok := program.Statements[0].(*IfStmt)
+	if !ok {
+		t.Fatal("expected an if statement")
+	}
+	if ifStmt.Cond.String() != "x" {
+		t.Fatalf("got %s, expected x", ifStmt.Cond.String())
+	}
+	if len(ifStmt.Body.Statements) != 1 {
+		t.Fatalf("got %d statements, expected 1", len(ifStmt.Body.Statements))
+	}
+
+	innerIf, ok := ifStmt.Body.Statements[0].(*IfStmt)
+	if !ok {
+		t.Fatal("expected nested if statement")
+	}
+	if innerIf.Cond.String() != "y" {
+		t.Fatalf("got %s, expected y", innerIf.Cond.String())
+	}
+	if len(innerIf.Body.Statements) != 1 {
+		t.Fatalf("got %d statements, expected 1", len(innerIf.Body.Statements))
+	}
+	if innerIf.Body.Statements[0].String() != "x = 1" {
+		t.Fatalf("got %q, expected %q", innerIf.Body.Statements[0], "x = 1")
+	}
+}
+
+func TestParserEmptyIfBlock(t *testing.T) {
+	progString := `
+    if x {
+    } else {
+    }
+    `
+	program, err := Parse(progString)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(program.Statements) != 1 {
+		t.Fatalf("got %d statements, expected 1", len(program.Statements))
+	}
+
+	ifStmt, ok := program.Statements[0].(*IfStmt)
+	if !ok {
+		t.Fatal("expected an if statement")
+	}
+	if ifStmt.Cond.String() != "x" {
+		t.Fatalf("got %s, expected x", ifStmt.Cond.String())
+	}
+
+	if len(ifStmt.Body.Statements) != 0 {
+		t.Fatalf("got %d statements in body, expected 0", len(ifStmt.Body.Statements))
+	}
+
+	elseBlock := ifStmt.Else
+	if elseBlock == nil {
+		t.Fatal("expected else block, got nil")
+	}
+	if len(elseBlock.Statements) != 0 {
+		t.Fatalf("got %d statements in else block, expected 0", len(elseBlock.Statements))
+	}
+}
+
+func TestParserIfStmtNoElse(t *testing.T) {
+	progString := `
+    if x {
+		x = x + 1;
+    }
+    `
+	program, err := Parse(progString)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(program.Statements) != 1 {
+		t.Fatalf("got %d statements, expected 1", len(program.Statements))
+	}
+
+	ifStmt, ok := program.Statements[0].(*IfStmt)
+	if !ok {
+		t.Fatal("expected an if statement")
+	}
+	if ifStmt.Cond.String() != "x" {
+		t.Fatalf("got %s, expected x", ifStmt.Cond.String())
+	}
+
+	if len(ifStmt.Body.Statements) != 1 {
+		t.Fatalf("got %d statements in body, expected 1", len(ifStmt.Body.Statements))
+	}
+
+	elseBlock := ifStmt.Else
+	if elseBlock != nil {
+		t.Fatal("expected nil else block")
+	}
+}
