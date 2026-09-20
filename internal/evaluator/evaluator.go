@@ -7,6 +7,20 @@ import (
 	"github.com/shsiddhant/gotiny/internal/objects"
 )
 
+type EvalError struct {
+	Line    int
+	Column  int
+	Message string
+}
+
+func (e *EvalError) Error() string {
+	return fmt.Sprintf("evaluation error at line %d, column %d: %s",
+		e.Line,
+		e.Column,
+		e.Message,
+	)
+}
+
 func evalAssignStmt(stmt *ast.AssignStmt, env *Environment) (objects.Value, error) {
 	value, err := EvalExpr(stmt.Value, env)
 
@@ -14,7 +28,14 @@ func evalAssignStmt(stmt *ast.AssignStmt, env *Environment) (objects.Value, erro
 		return nil, err
 	}
 
-	return nil, env.Assign(stmt.Name.Value, value)
+	if err := env.Assign(stmt.Name.Value, value); err != nil {
+		return nil, &EvalError{
+			Line:    stmt.Name.Line,
+			Column:  stmt.Name.Column,
+			Message: err.Error(),
+		}
+	}
+	return nil, nil
 }
 
 func evalLetStmt(stmt *ast.LetStmt, env *Environment) (objects.Value, error) {
@@ -24,7 +45,15 @@ func evalLetStmt(stmt *ast.LetStmt, env *Environment) (objects.Value, error) {
 		return nil, err
 	}
 
-	return nil, env.Define(stmt.Name.Value, value)
+	if err := env.Define(stmt.Name.Value, value); err != nil {
+		return nil, &EvalError{
+			Line:    stmt.Name.Line,
+			Column:  stmt.Name.Column,
+			Message: err.Error(),
+		}
+	}
+
+	return nil, nil
 }
 
 func EvalStmt(stmt ast.Stmt, env *Environment) (objects.Value, error) {

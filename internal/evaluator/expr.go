@@ -17,8 +17,12 @@ func evalUnary(expr *ast.UnaryExpr, env *Environment) (objects.Value, error) {
 
 	value, ok := operandEval.(objects.Int)
 	if !ok {
-		return nil, fmt.Errorf(
-			"unary operator %q cannot be applied to %s", expr.Operator.Value, operandEval.Type())
+		return nil, &EvalError{
+			Line:   expr.Operator.Line,
+			Column: expr.Operator.Column,
+			Message: fmt.Sprintf(
+				"unary operator %q cannot be applied to %s", expr.Operator.Value, operandEval.Type()),
+		}
 	}
 
 	switch expr.Operator.Type {
@@ -27,7 +31,11 @@ func evalUnary(expr *ast.UnaryExpr, env *Environment) (objects.Value, error) {
 	case token.Minus:
 		return -value, nil
 	default:
-		return nil, fmt.Errorf("Invalid unary operator %s", expr.Operator)
+		return nil, &EvalError{
+			Line:    expr.Operator.Line,
+			Column:  expr.Operator.Column,
+			Message: fmt.Sprintf("Invalid unary operator %s", expr.Operator),
+		}
 	}
 
 }
@@ -45,12 +53,16 @@ func evalBinary(expr *ast.BinaryExpr, env *Environment) (objects.Value, error) {
 	}
 
 	if left.Type() != objects.IntType || right.Type() != objects.IntType {
-		return nil, fmt.Errorf(
-			"binary operator %q cannot be applied to %s and %s",
-			expr.Operator.Value,
-			left.Type(),
-			right.Type(),
-		)
+		return nil, &EvalError{
+			Line:   expr.Operator.Line,
+			Column: expr.Operator.Column,
+			Message: fmt.Sprintf(
+				"binary operator %q cannot be applied to %s and %s",
+				expr.Operator.Value,
+				left.Type(),
+				right.Type(),
+			),
+		}
 	}
 
 	leftInt, rightInt := left.(objects.Int), right.(objects.Int)
@@ -64,11 +76,19 @@ func evalBinary(expr *ast.BinaryExpr, env *Environment) (objects.Value, error) {
 		return leftInt * rightInt, nil
 	case token.Slash:
 		if right == objects.Int(0) {
-			return nil, fmt.Errorf("division by zero")
+			return nil, &EvalError{
+				Line:    expr.Operator.Line,
+				Column:  expr.Operator.Column,
+				Message: "division by zero",
+			}
 		}
 		return leftInt / rightInt, nil
 	default:
-		return nil, fmt.Errorf("Invalid binary operator %s", expr.Operator)
+		return nil, &EvalError{
+			Line:    expr.Operator.Line,
+			Column:  expr.Operator.Column,
+			Message: fmt.Sprintf("Invalid binary operator %s", expr.Operator),
+		}
 	}
 }
 
