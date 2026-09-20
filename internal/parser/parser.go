@@ -16,12 +16,28 @@ type Parser struct {
 	peek    token.Token
 }
 
+type ParseError struct {
+	Token   token.Token
+	Message string
+}
+
+func (e *ParseError) Error() string {
+	return fmt.Sprintf("parse error at line %d, column %d: %s",
+		e.Token.Line,
+		e.Token.Column,
+		e.Message,
+	)
+}
+
 func (p *Parser) advance() error {
 	p.current = p.peek
 
 	token, err := p.lexer.Next()
 	if err != nil {
-		return err
+		return &ParseError{
+			Token:   token,
+			Message: err.Error(),
+		}
 	}
 
 	p.peek = token
@@ -43,7 +59,10 @@ func NewParser(lexer *lexer.Lexer) (*Parser, error) {
 
 func (p *Parser) consume(kind token.TokenType) error {
 	if p.current.Type != kind {
-		return fmt.Errorf("expected %s, got %s", kind, p.current.Type)
+		return &ParseError{
+			Token:   p.current,
+			Message: fmt.Sprintf("expected %s, got %s", kind, p.current.Type),
+		}
 	}
 	return p.advance()
 }
@@ -106,7 +125,10 @@ func (p *Parser) primary() (ast.Expr, error) {
 		return &ast.GroupExpr{Expression: expr}, nil
 	}
 
-	return nil, fmt.Errorf("expected expression, got %s", p.current.Type)
+	return nil, &ParseError{
+		Token:   p.current,
+		Message: fmt.Sprintf("expected expression, got %s", p.current.Type),
+	}
 }
 
 func (p *Parser) unary() (ast.Expr, error) {

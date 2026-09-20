@@ -146,7 +146,7 @@ func (l *Lexer) Next() (token.Token, error) {
 		return l.identifierOrKeyword(line, column), nil
 	}
 
-	return token.Token{Line: line, Column: column}, fmt.Errorf("unexpected character: %q", c)
+	return token.Token{Line: line, Column: column}, fmt.Errorf("unexpected character: \"%c\"", c)
 }
 
 var keywords = map[string]token.TokenType{

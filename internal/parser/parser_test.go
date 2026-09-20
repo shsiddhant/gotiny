@@ -101,6 +101,22 @@ func TestParserRejectsTrailingTokens(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error")
 	}
+
+	parseErr, ok := err.(*ParseError)
+	if !ok {
+		t.Fatalf("expected ParseError: %+v", parseErr)
+	}
+
+	if parseErr.Token.Column != 3 {
+		t.Fatalf("expected parse error at column 3, got %d", parseErr.Token.Column)
+	}
+	if parseErr.Token.Line != 1 {
+		t.Fatalf("expected parse error at line: 3, got %d", parseErr.Token.Line)
+	}
+	if parseErr.Token.Value != "2" {
+		t.Fatalf("expected parse error for token value 2, got %s", parseErr.Token.Value)
+	}
+
 }
 
 func TestParserRejectsIncompleteExpression(t *testing.T) {
