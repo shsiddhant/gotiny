@@ -68,7 +68,7 @@ func (p *Parser) consume(kind token.TokenType) error {
 }
 
 func (p *Parser) expression() (ast.Expr, error) {
-	return p.addition()
+	return p.equality()
 }
 
 func (p *Parser) primary() (ast.Expr, error) {
@@ -193,6 +193,63 @@ func (p *Parser) addition() (ast.Expr, error) {
 
 		right, err := p.multiplication()
 
+		if err != nil {
+			return nil, err
+		}
+
+		expr = &ast.BinaryExpr{
+			Left:     expr,
+			Operator: operator,
+			Right:    right,
+		}
+	}
+	return expr, nil
+}
+
+func (p *Parser) comparison() (ast.Expr, error) {
+	expr, err := p.addition()
+	if err != nil {
+		return nil, err
+	}
+	for p.current.Type == token.Less ||
+		p.current.Type == token.LessEqual ||
+		p.current.Type == token.Greater ||
+		p.current.Type == token.GreaterEqual {
+
+		operator := p.current
+
+		if err := p.advance(); err != nil {
+			return nil, err
+		}
+
+		right, err := p.addition()
+		if err != nil {
+			return nil, err
+		}
+
+		expr = &ast.BinaryExpr{
+			Left:     expr,
+			Operator: operator,
+			Right:    right,
+		}
+	}
+	return expr, nil
+}
+
+func (p *Parser) equality() (ast.Expr, error) {
+	expr, err := p.comparison()
+	if err != nil {
+		return nil, err
+	}
+	for p.current.Type == token.EqualEqual || p.current.Type == token.NotEqual {
+
+		operator := p.current
+
+		if err := p.advance(); err != nil {
+			return nil, err
+		}
+
+		right, err := p.comparison()
 		if err != nil {
 			return nil, err
 		}

@@ -111,7 +111,7 @@ func TestParserRejectsTrailingTokens(t *testing.T) {
 		t.Fatalf("expected parse error at column 3, got %d", parseErr.Token.Column)
 	}
 	if parseErr.Token.Line != 1 {
-		t.Fatalf("expected parse error at line: 3, got %d", parseErr.Token.Line)
+		t.Fatalf("expected parse error at line: 1, got %d", parseErr.Token.Line)
 	}
 	if parseErr.Token.Value != "2" {
 		t.Fatalf("expected parse error for token value 2, got %s", parseErr.Token.Value)
@@ -345,4 +345,118 @@ func TestParserIfStmtNoElse(t *testing.T) {
 	if elseBlock != nil {
 		t.Fatal("expected nil else block")
 	}
+}
+
+func TestParserComparison(t *testing.T) {
+
+	program, err := Parse("x>=1;")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(program.Statements) != 1 {
+		t.Fatalf("got %d statements, expected 1", len(program.Statements))
+	}
+
+	exprStmt, ok := program.Statements[0].(*ast.ExprStmt)
+	if !ok {
+		t.Fatalf("expected an expression statement, got %T", program.Statements[0])
+	}
+	binaryExpr, ok := exprStmt.Expression.(*ast.BinaryExpr)
+	if !ok {
+		t.Fatalf("expected a binary expression, got %T", exprStmt.Expression)
+	}
+	if binaryExpr.String() != "(x >= 1)" {
+		t.Errorf("expected expression (x >= 1), got %s", binaryExpr)
+	}
+
+}
+
+func TestParserComparisonMalformed(t *testing.T) {
+	_, err := Parse("x> = 1;")
+
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	parseErr, ok := err.(*ParseError)
+	if !ok {
+		t.Fatalf("expected ParseError: %+v", parseErr)
+	}
+
+	if parseErr.Token.Column != 4 {
+		t.Fatalf("expected parse error at column 4, got %d", parseErr.Token.Column)
+	}
+	if parseErr.Token.Line != 1 {
+		t.Fatalf("expected parse error at line: 1, got %d", parseErr.Token.Line)
+	}
+	if parseErr.Token.Value != "=" {
+		t.Fatalf("expected parse error for token value \"=\", got %q", parseErr.Token.Value)
+	}
+
+}
+
+func TestParserEquality(t *testing.T) {
+	expected := "(((x + 2) == 1) != true)"
+	program, err := Parse("x + 2 == 1 != true;")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(program.Statements) != 1 {
+		t.Fatalf("got %d statements, expected 1", len(program.Statements))
+	}
+
+	exprStmt, ok := program.Statements[0].(*ast.ExprStmt)
+	if !ok {
+		t.Fatalf("expected an expression statement, got %T", program.Statements[0])
+	}
+	binaryExpr, ok := exprStmt.Expression.(*ast.BinaryExpr)
+	if !ok {
+		t.Fatalf("expected a binary expression, got %T", exprStmt.Expression)
+	}
+	if binaryExpr.String() != expected {
+		t.Errorf("expected expression %s, got %s", expected, binaryExpr)
+	}
+}
+
+func TestParserMalformedEquality(t *testing.T) {
+	_, err := Parse("x === 1;")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	parseErr, ok := err.(*ParseError)
+	if !ok {
+		t.Fatalf("expected ParseError: %+v", parseErr)
+	}
+
+	if parseErr.Token.Column != 5 {
+		t.Fatalf("expected parse error at column 5, got %d", parseErr.Token.Column)
+	}
+	if parseErr.Token.Line != 1 {
+		t.Fatalf("expected parse error at line: 1, got %d", parseErr.Token.Line)
+	}
+	if parseErr.Token.Value != "=" {
+		t.Fatalf("expected parse error for token value \"=\", got %q", parseErr.Token.Value)
+	}
+
+}
+
+func TestParserMalformedInEquality(t *testing.T) {
+	_, err := Parse("x !=== 1;")
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	parseErr, ok := err.(*ParseError)
+	if !ok {
+		t.Fatalf("expected ParseError: %+v", parseErr)
+	}
+
+	if parseErr.Token.Column != 5 {
+		t.Fatalf("expected parse error at column 5, got %d", parseErr.Token.Column)
+	}
+	if parseErr.Token.Line != 1 {
+		t.Fatalf("expected parse error at line: 1, got %d", parseErr.Token.Line)
+	}
+	if parseErr.Token.Value != "==" {
+		t.Fatalf("expected parse error for token value \"==\", got %q", parseErr.Token.Value)
+	}
+
 }
