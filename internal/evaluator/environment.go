@@ -1,18 +1,20 @@
-package main
+package evaluator
 
 import (
 	"fmt"
+
+	"github.com/shsiddhant/gotiny/internal/objects"
 )
 
 type Environment struct {
-	values map[string]Value
+	values map[string]objects.Value
 }
 
 func NewEnvironment() *Environment {
-	return &Environment{values: make(map[string]Value)}
+	return &Environment{values: make(map[string]objects.Value)}
 }
 
-func (e *Environment) Get(name string) (Value, error) {
+func (e *Environment) Get(name string) (objects.Value, error) {
 	value, ok := e.values[name]
 
 	if !ok {
@@ -21,11 +23,11 @@ func (e *Environment) Get(name string) (Value, error) {
 	return value, nil
 }
 
-func (e *Environment) Set(name string, value Value) {
+func (e *Environment) Set(name string, value objects.Value) {
 	e.values[name] = value
 }
 
-func (e *Environment) Assign(name string, value Value) error {
+func (e *Environment) Assign(name string, value objects.Value) error {
 	current, ok := e.values[name]
 
 	if !ok {
@@ -38,7 +40,7 @@ func (e *Environment) Assign(name string, value Value) error {
 	return nil
 }
 
-func (e *Environment) Define(name string, value Value) error {
+func (e *Environment) Define(name string, value objects.Value) error {
 	if _, exists := e.values[name]; exists {
 		return fmt.Errorf("variable %s already defined", name)
 	}

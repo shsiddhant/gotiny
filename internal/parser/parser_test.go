@@ -1,7 +1,9 @@
-package main
+package parser
 
 import (
 	"testing"
+
+	"github.com/shsiddhant/gotiny/internal/ast"
 )
 
 func TestParser(t *testing.T) {
@@ -182,7 +184,7 @@ func TestParserIfStmt(t *testing.T) {
 		t.Fatalf("got %d statements, expected 1", len(program.Statements))
 	}
 
-	ifStmt, ok := program.Statements[0].(*IfStmt)
+	ifStmt, ok := program.Statements[0].(*ast.IfStmt)
 	if !ok {
 		t.Fatal("expected an if statement")
 	}
@@ -236,7 +238,7 @@ func TestParserNestedIfStmt(t *testing.T) {
 		t.Fatalf("got %d statements, expected 1", len(program.Statements))
 	}
 
-	ifStmt, ok := program.Statements[0].(*IfStmt)
+	ifStmt, ok := program.Statements[0].(*ast.IfStmt)
 	if !ok {
 		t.Fatal("expected an if statement")
 	}
@@ -247,7 +249,7 @@ func TestParserNestedIfStmt(t *testing.T) {
 		t.Fatalf("got %d statements, expected 1", len(ifStmt.Body.Statements))
 	}
 
-	innerIf, ok := ifStmt.Body.Statements[0].(*IfStmt)
+	innerIf, ok := ifStmt.Body.Statements[0].(*ast.IfStmt)
 	if !ok {
 		t.Fatal("expected nested if statement")
 	}
@@ -276,7 +278,7 @@ func TestParserEmptyIfBlock(t *testing.T) {
 		t.Fatalf("got %d statements, expected 1", len(program.Statements))
 	}
 
-	ifStmt, ok := program.Statements[0].(*IfStmt)
+	ifStmt, ok := program.Statements[0].(*ast.IfStmt)
 	if !ok {
 		t.Fatal("expected an if statement")
 	}
@@ -311,7 +313,7 @@ func TestParserIfStmtNoElse(t *testing.T) {
 		t.Fatalf("got %d statements, expected 1", len(program.Statements))
 	}
 
-	ifStmt, ok := program.Statements[0].(*IfStmt)
+	ifStmt, ok := program.Statements[0].(*ast.IfStmt)
 	if !ok {
 		t.Fatal("expected an if statement")
 	}

@@ -1,29 +1,33 @@
-package main
+package lexer
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/shsiddhant/gotiny/internal/token"
+)
 
 func TestLexer(t *testing.T) {
 	input := "let x = 123 + 4 * (2 - 1) - _tgb;"
 
 	lexer := NewLexer(input)
 
-	expected := []Token{
-		{Type: Let, Value: "let"},
-		{Type: Identifier, Value: "x"},
-		{Type: Equal, Value: "="},
-		{Type: Number, Value: "123"},
-		{Type: Plus, Value: "+"},
-		{Type: Number, Value: "4"},
-		{Type: Star, Value: "*"},
-		{Type: LeftParen, Value: "("},
-		{Type: Number, Value: "2"},
-		{Type: Minus, Value: "-"},
-		{Type: Number, Value: "1"},
-		{Type: RightParen, Value: ")"},
-		{Type: Minus, Value: "-"},
-		{Type: Identifier, Value: "_tgb"},
-		{Type: SemiColon, Value: ";"},
-		{Type: EOF},
+	expected := []token.Token{
+		{Type: token.Let, Value: "let"},
+		{Type: token.Identifier, Value: "x"},
+		{Type: token.Equal, Value: "="},
+		{Type: token.Number, Value: "123"},
+		{Type: token.Plus, Value: "+"},
+		{Type: token.Number, Value: "4"},
+		{Type: token.Star, Value: "*"},
+		{Type: token.LeftParen, Value: "("},
+		{Type: token.Number, Value: "2"},
+		{Type: token.Minus, Value: "-"},
+		{Type: token.Number, Value: "1"},
+		{Type: token.RightParen, Value: ")"},
+		{Type: token.Minus, Value: "-"},
+		{Type: token.Identifier, Value: "_tgb"},
+		{Type: token.SemiColon, Value: ";"},
+		{Type: token.EOF},
 	}
 
 	for i := 0; ; i++ {
@@ -40,7 +44,7 @@ func TestLexer(t *testing.T) {
 			t.Errorf("token %d: got %v, expected %v", i, got, expected[i])
 		}
 
-		if got.Type == EOF {
+		if got.Type == token.EOF {
 			if i != len(expected)-1 {
 				t.Errorf("lexer reached EOF early: got %d tokens, expected %d", i+1, len(expected))
 			}
@@ -66,13 +70,13 @@ func TestLexerUnexpectedCharacter(t *testing.T) {
 func TestLexerKeywords(t *testing.T) {
 	lexer := NewLexer("let x = true;")
 
-	expected := []Token{
-		{Let, "let"},
-		{Identifier, "x"},
-		{Equal, "="},
-		{True, "true"},
-		{SemiColon, ";"},
-		{Type: EOF},
+	expected := []token.Token{
+		{Type: token.Let, Value: "let"},
+		{Type: token.Identifier, Value: "x"},
+		{Type: token.Equal, Value: "="},
+		{Type: token.True, Value: "true"},
+		{Type: token.SemiColon, Value: ";"},
+		{Type: token.EOF},
 	}
 
 	for i := 0; ; i++ {
@@ -89,7 +93,7 @@ func TestLexerKeywords(t *testing.T) {
 			t.Errorf("token %d: got %v, expected %v", i, got, expected[i])
 		}
 
-		if got.Type == EOF {
+		if got.Type == token.EOF {
 			if i != len(expected)-1 {
 				t.Errorf("lexer reached EOF early: got %d tokens, expected %d", i+1, len(expected))
 			}

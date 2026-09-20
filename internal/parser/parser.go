@@ -1,14 +1,19 @@
-package main
+package parser
 
 import (
 	"fmt"
 	"strconv"
+
+	"github.com/shsiddhant/gotiny/internal/ast"
+	"github.com/shsiddhant/gotiny/internal/lexer"
+	"github.com/shsiddhant/gotiny/internal/objects"
+	"github.com/shsiddhant/gotiny/internal/token"
 )
 
 type Parser struct {
-	lexer   *Lexer
-	current Token
-	peek    Token
+	lexer   *lexer.Lexer
+	current token.Token
+	peek    token.Token
 }
 
 func (p *Parser) advance() error {
@@ -23,7 +28,7 @@ func (p *Parser) advance() error {
 	return nil
 }
 
-func NewParser(lexer *Lexer) (*Parser, error) {
+func NewParser(lexer *lexer.Lexer) (*Parser, error) {
 	p := &Parser{lexer: lexer}
 
 	// advance twice to initialize both current and peek.
@@ -36,55 +41,55 @@ func NewParser(lexer *Lexer) (*Parser, error) {
 	return p, nil
 }
 
-func (p *Parser) consume(kind TokenType) error {
+func (p *Parser) consume(kind token.TokenType) error {
 	if p.current.Type != kind {
 		return fmt.Errorf("expected %s, got %s", kind, p.current.Type)
 	}
 	return p.advance()
 }
 
-func (p *Parser) expression() (Expr, error) {
+func (p *Parser) expression() (ast.Expr, error) {
 	return p.addition()
 }
 
-func (p *Parser) primary() (Expr, error) {
+func (p *Parser) primary() (ast.Expr, error) {
 	switch p.current.Type {
-	case Number:
+	case token.Number:
 		value, err := strconv.Atoi(p.current.Value)
 		if err != nil {
 			return nil, err
 		}
 
-		expr := &LiteralExpr{Value: Int(value)}
+		expr := &ast.LiteralExpr{Value: objects.Int(value)}
 
 		if err := p.advance(); err != nil {
 			return nil, err
 		}
 		return expr, nil
 
-	case True:
-		expr := &LiteralExpr{Value: Bool(true)}
+	case token.True:
+		expr := &ast.LiteralExpr{Value: objects.Bool(true)}
 		if err := p.advance(); err != nil {
 			return nil, err
 		}
 		return expr, nil
 
-	case False:
-		expr := &LiteralExpr{Value: Bool(false)}
+	case token.False:
+		expr := &ast.LiteralExpr{Value: objects.Bool(false)}
 		if err := p.advance(); err != nil {
 			return nil, err
 		}
 		return expr, nil
 
-	case Identifier:
-		expr := &VariableExpr{Name: p.current}
+	case token.Identifier:
+		expr := &ast.VariableExpr{Name: p.current}
 
 		if err := p.advance(); err != nil {
 			return nil, err
 		}
 		return expr, nil
 
-	case LeftParen:
+	case token.LeftParen:
 		if err := p.advance(); err != nil {
 			return nil, err
 		}
@@ -94,18 +99,18 @@ func (p *Parser) primary() (Expr, error) {
 			return nil, err
 		}
 
-		if err := p.consume(RightParen); err != nil {
+		if err := p.consume(token.RightParen); err != nil {
 			return nil, err
 		}
 
-		return &GroupExpr{Expression: expr}, nil
+		return &ast.GroupExpr{Expression: expr}, nil
 	}
 
 	return nil, fmt.Errorf("expected expression, got %s", p.current.Type)
 }
 
-func (p *Parser) unary() (Expr, error) {
-	if p.current.Type == Plus || p.current.Type == Minus {
+func (p *Parser) unary() (ast.Expr, error) {
+	if p.current.Type == token.Plus || p.current.Type == token.Minus {
 		operator := p.current
 
 		if err := p.advance(); err != nil {
@@ -118,19 +123,19 @@ func (p *Parser) unary() (Expr, error) {
 			return nil, err
 		}
 
-		return &UnaryExpr{Operator: operator, Operand: operand}, nil
+		return &ast.UnaryExpr{Operator: operator, Operand: operand}, nil
 	}
 	return p.primary()
 }
 
-func (p *Parser) multiplication() (Expr, error) {
+func (p *Parser) multiplication() (ast.Expr, error) {
 	expr, err := p.unary()
 
 	if err != nil {
 		return nil, err
 	}
 
-	for p.current.Type == Star || p.current.Type == Slash {
+	for p.current.Type == token.Star || p.current.Type == token.Slash {
 		operator := p.current
 
 		if err := p.advance(); err != nil {
@@ -142,7 +147,7 @@ func (p *Parser) multiplication() (Expr, error) {
 			return nil, err
 		}
 
-		expr = &BinaryExpr{
+		expr = &ast.BinaryExpr{
 			Left:     expr,
 			Operator: operator,
 			Right:    right,
@@ -151,13 +156,13 @@ func (p *Parser) multiplication() (Expr, error) {
 	return expr, nil
 }
 
-func (p *Parser) addition() (Expr, error) {
+func (p *Parser) addition() (ast.Expr, error) {
 	expr, err := p.multiplication()
 
 	if err != nil {
 		return nil, err
 	}
-	for p.current.Type == Plus || p.current.Type == Minus {
+	for p.current.Type == token.Plus || p.current.Type == token.Minus {
 		operator := p.current
 
 		if err := p.advance(); err != nil {
@@ -170,7 +175,7 @@ func (p *Parser) addition() (Expr, error) {
 			return nil, err
 		}
 
-		expr = &BinaryExpr{
+		expr = &ast.BinaryExpr{
 			Left:     expr,
 			Operator: operator,
 			Right:    right,
@@ -179,20 +184,20 @@ func (p *Parser) addition() (Expr, error) {
 	return expr, nil
 }
 
-func (p *Parser) exprStatement() (Stmt, error) {
+func (p *Parser) exprStatement() (ast.Stmt, error) {
 	expr, err := p.expression()
 	if err != nil {
 		return nil, err
 	}
-	return &ExprStmt{Expression: expr}, nil
+	return &ast.ExprStmt{Expression: expr}, nil
 }
 
-func (p *Parser) assignStatement() (Stmt, error) {
+func (p *Parser) assignStatement() (ast.Stmt, error) {
 	name := p.current.Value
-	if err := p.consume(Identifier); err != nil {
+	if err := p.consume(token.Identifier); err != nil {
 		return nil, err
 	}
-	if err := p.consume(Equal); err != nil {
+	if err := p.consume(token.Equal); err != nil {
 		return nil, err
 	}
 	value, err := p.expression()
@@ -200,21 +205,21 @@ func (p *Parser) assignStatement() (Stmt, error) {
 		return nil, err
 	}
 
-	return &AssignStmt{
+	return &ast.AssignStmt{
 		Name:  name,
 		Value: value,
 	}, nil
 }
 
-func (p *Parser) letStatement() (Stmt, error) {
-	if err := p.consume(Let); err != nil {
+func (p *Parser) letStatement() (ast.Stmt, error) {
+	if err := p.consume(token.Let); err != nil {
 		return nil, err
 	}
 	name := p.current.Value
-	if err := p.consume(Identifier); err != nil {
+	if err := p.consume(token.Identifier); err != nil {
 		return nil, err
 	}
-	if err := p.consume(Equal); err != nil {
+	if err := p.consume(token.Equal); err != nil {
 		return nil, err
 	}
 	value, err := p.expression()
@@ -222,33 +227,33 @@ func (p *Parser) letStatement() (Stmt, error) {
 		return nil, err
 	}
 
-	return &LetStmt{
+	return &ast.LetStmt{
 		Name:  name,
 		Value: value,
 	}, nil
 }
 
-func (p *Parser) block() (*BlockStmt, error) {
-	if err := p.consume(LeftCurlyBrace); err != nil {
+func (p *Parser) block() (*ast.BlockStmt, error) {
+	if err := p.consume(token.LeftCurlyBrace); err != nil {
 		return nil, err
 	}
-	block := &BlockStmt{}
+	block := &ast.BlockStmt{}
 
-	for p.current.Type != RightCurlyBrace {
+	for p.current.Type != token.RightCurlyBrace {
 		stmt, err := p.statement()
 		if err != nil {
 			return nil, err
 		}
 		block.Statements = append(block.Statements, stmt)
 	}
-	if err := p.consume(RightCurlyBrace); err != nil {
+	if err := p.consume(token.RightCurlyBrace); err != nil {
 		return nil, err
 	}
 	return block, nil
 }
 
-func (p *Parser) ifStatement() (Stmt, error) {
-	if err := p.consume(If); err != nil {
+func (p *Parser) ifStatement() (ast.Stmt, error) {
+	if err := p.consume(token.If); err != nil {
 		return nil, err
 	}
 	cond, err := p.expression()
@@ -259,8 +264,8 @@ func (p *Parser) ifStatement() (Stmt, error) {
 	if err != nil {
 		return nil, err
 	}
-	var elseblock *BlockStmt
-	if p.current.Type == Else {
+	var elseblock *ast.BlockStmt
+	if p.current.Type == token.Else {
 		if err := p.advance(); err != nil {
 			return nil, err
 		}
@@ -269,23 +274,23 @@ func (p *Parser) ifStatement() (Stmt, error) {
 			return nil, err
 		}
 	}
-	return &IfStmt{
+	return &ast.IfStmt{
 		Cond: cond,
 		Body: body,
 		Else: elseblock,
 	}, nil
 }
 
-func (p *Parser) statement() (Stmt, error) {
-	var stmt Stmt
+func (p *Parser) statement() (ast.Stmt, error) {
+	var stmt ast.Stmt
 	var err error
 
 	switch {
-	case p.current.Type == Let:
+	case p.current.Type == token.Let:
 		stmt, err = p.letStatement()
-	case p.current.Type == If:
+	case p.current.Type == token.If:
 		return p.ifStatement()
-	case p.current.Type == Identifier && p.peek.Type == Equal:
+	case p.current.Type == token.Identifier && p.peek.Type == token.Equal:
 		stmt, err = p.assignStatement()
 	default:
 		stmt, err = p.exprStatement()
@@ -293,18 +298,18 @@ func (p *Parser) statement() (Stmt, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := p.consume(SemiColon); err != nil {
+	if err := p.consume(token.SemiColon); err != nil {
 		return nil, err
 	}
 
 	return stmt, err
 }
 
-func (p *Parser) Parse() (*Program, error) {
+func (p *Parser) Parse() (*ast.Program, error) {
 
-	program := &Program{}
+	program := &ast.Program{}
 
-	for p.current.Type != EOF {
+	for p.current.Type != token.EOF {
 		stmt, err := p.statement()
 		if err != nil {
 			return nil, err
@@ -315,10 +320,10 @@ func (p *Parser) Parse() (*Program, error) {
 	return program, nil
 }
 
-func Parse(source string) (*Program, error) {
-	lexer := NewLexer(source)
+func Parse(source string) (*ast.Program, error) {
+	newLexer := lexer.NewLexer(source)
 
-	parser, err := NewParser(lexer)
+	parser, err := NewParser(newLexer)
 
 	if err != nil {
 		return nil, err

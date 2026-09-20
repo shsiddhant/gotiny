@@ -1,13 +1,15 @@
-package main
+package evaluator
 
 import (
 	"testing"
+
+	"github.com/shsiddhant/gotiny/internal/objects"
 )
 
 func TestEnvironmentSetGet(t *testing.T) {
 	env := NewEnvironment()
 
-	value := Int(1712)
+	value := objects.Int(1712)
 
 	env.Set("x", value)
 
@@ -24,9 +26,9 @@ func TestEnvironmentSetGet(t *testing.T) {
 func TestEnvironmentSetExisting(t *testing.T) {
 	env := NewEnvironment()
 
-	old := Int(1712)
+	old := objects.Int(1712)
 
-	new := Int(2412)
+	new := objects.Int(2412)
 
 	env.Set("x", old)
 	env.Set("x", new)
@@ -44,7 +46,7 @@ func TestEnvironmentSetExisting(t *testing.T) {
 func TestEnvironmentDefine(t *testing.T) {
 	env := NewEnvironment()
 
-	name, value := "x", Int(1712)
+	name, value := "x", objects.Int(1712)
 
 	if err := env.Define(name, value); err != nil {
 		t.Fatal(err)
@@ -62,13 +64,13 @@ func TestEnvironmentDefine(t *testing.T) {
 func TestEnvironmentAlreadyDefined(t *testing.T) {
 	env := NewEnvironment()
 
-	name, value := "x", Int(1712)
+	name, value := "x", objects.Int(1712)
 
 	if err := env.Define(name, value); err != nil {
 		t.Fatal(err)
 	}
 
-	if err := env.Define(name, Int(1205)); err == nil {
+	if err := env.Define(name, objects.Int(1205)); err == nil {
 		t.Fatal("expected error")
 	}
 }
@@ -76,14 +78,14 @@ func TestEnvironmentAlreadyDefined(t *testing.T) {
 func TestEnvironmentAssign(t *testing.T) {
 	env := NewEnvironment()
 
-	name, value := "x", Bool(false)
+	name, value := "x", objects.Bool(false)
 
 	err := env.Define(name, value)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	newValue := Bool(false)
+	newValue := objects.Bool(false)
 
 	err = env.Assign(name, newValue)
 	if err != nil {
@@ -103,7 +105,7 @@ func TestEnvironmentAssign(t *testing.T) {
 func TestEnvironmentAssignUndefined(t *testing.T) {
 	env := NewEnvironment()
 
-	err := env.Assign("x", Int(1712))
+	err := env.Assign("x", objects.Int(1712))
 	if err == nil {
 		t.Error("expected undefined variable error")
 	}
@@ -112,11 +114,11 @@ func TestEnvironmentAssignUndefined(t *testing.T) {
 func TestEnvironmentAssignWrongType(t *testing.T) {
 	env := NewEnvironment()
 
-	err := env.Define("x", Int(1729))
+	err := env.Define("x", objects.Int(1729))
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = env.Assign("x", Bool(true))
+	err = env.Assign("x", objects.Bool(true))
 	if err == nil {
 		t.Error("expected wrong type assignment error")
 	}

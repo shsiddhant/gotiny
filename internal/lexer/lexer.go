@@ -1,6 +1,10 @@
-package main
+package lexer
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/shsiddhant/gotiny/internal/token"
+)
 
 type Lexer struct {
 	source  []rune
@@ -44,13 +48,13 @@ func isDigit(c rune) bool {
 	return c >= '0' && c <= '9'
 }
 
-func (l *Lexer) number() Token {
+func (l *Lexer) number() token.Token {
 	for isDigit(l.peek()) {
 		l.advance()
 	}
 
-	return Token{
-		Type:  Number,
+	return token.Token{
+		Type:  token.Number,
 		Value: string(l.source[l.start:l.current]),
 	}
 }
@@ -63,7 +67,7 @@ func isIdentifierPart(c rune) bool {
 	return isLetter(c) || isDigit(c)
 }
 
-func (l *Lexer) identifierOrKeyword() Token {
+func (l *Lexer) identifierOrKeyword() token.Token {
 	for isIdentifierPart(l.peek()) {
 		l.advance()
 	}
@@ -71,24 +75,24 @@ func (l *Lexer) identifierOrKeyword() Token {
 	value := string(l.source[l.start:l.current])
 
 	if tokenType, ok := keywords[value]; ok {
-		return Token{
+		return token.Token{
 			Type:  tokenType,
 			Value: value,
 		}
 	}
 
-	return Token{
-		Type:  Identifier,
+	return token.Token{
+		Type:  token.Identifier,
 		Value: value,
 	}
 }
 
-func (l *Lexer) Next() (Token, error) {
+func (l *Lexer) Next() (token.Token, error) {
 	l.skipWhitespace()
 	l.start = l.current
 
 	if l.isAtEnd() {
-		return Token{Type: EOF}, nil
+		return token.Token{Type: token.EOF}, nil
 	}
 
 	c := l.advance()
@@ -96,27 +100,27 @@ func (l *Lexer) Next() (Token, error) {
 	switch c {
 	//Operators
 	case '+':
-		return Token{Type: Plus, Value: "+"}, nil
+		return token.Token{Type: token.Plus, Value: "+"}, nil
 	case '-':
-		return Token{Type: Minus, Value: "-"}, nil
+		return token.Token{Type: token.Minus, Value: "-"}, nil
 	case '*':
-		return Token{Type: Star, Value: "*"}, nil
+		return token.Token{Type: token.Star, Value: "*"}, nil
 	case '/':
-		return Token{Type: Slash, Value: "/"}, nil
+		return token.Token{Type: token.Slash, Value: "/"}, nil
 	case '=':
-		return Token{Type: Equal, Value: "="}, nil
+		return token.Token{Type: token.Equal, Value: "="}, nil
 
 	// Delimiters
 	case ';':
-		return Token{Type: SemiColon, Value: ";"}, nil
+		return token.Token{Type: token.SemiColon, Value: ";"}, nil
 	case '(':
-		return Token{Type: LeftParen, Value: "("}, nil
+		return token.Token{Type: token.LeftParen, Value: "("}, nil
 	case ')':
-		return Token{Type: RightParen, Value: ")"}, nil
+		return token.Token{Type: token.RightParen, Value: ")"}, nil
 	case '{':
-		return Token{Type: LeftCurlyBrace, Value: "{"}, nil
+		return token.Token{Type: token.LeftCurlyBrace, Value: "{"}, nil
 	case '}':
-		return Token{Type: RightCurlyBrace, Value: "}"}, nil
+		return token.Token{Type: token.RightCurlyBrace, Value: "}"}, nil
 	}
 
 	if isDigit(c) {
@@ -127,5 +131,13 @@ func (l *Lexer) Next() (Token, error) {
 		return l.identifierOrKeyword(), nil
 	}
 
-	return Token{}, fmt.Errorf("unexpected character: %q", c)
+	return token.Token{}, fmt.Errorf("unexpected character: %q", c)
+}
+
+var keywords = map[string]token.TokenType{
+	"let":   token.Let,
+	"true":  token.True,
+	"false": token.False,
+	"if":    token.If,
+	"else":  token.Else,
 }

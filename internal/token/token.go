@@ -1,4 +1,4 @@
-package main
+package token
 
 import "fmt"
 
@@ -40,12 +40,4 @@ type Token struct {
 
 func (token Token) String() string {
 	return fmt.Sprintf("%s(%s)", token.Type, token.Value)
-}
-
-var keywords = map[string]TokenType{
-	"let":   Let,
-	"true":  True,
-	"false": False,
-	"if":    If,
-	"else":  Else,
 }

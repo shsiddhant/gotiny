@@ -4,12 +4,15 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+
+	"github.com/shsiddhant/gotiny/internal/evaluator"
+	"github.com/shsiddhant/gotiny/internal/parser"
 )
 
-func RunREPL() {
+func runREPL() {
 	scanner := bufio.NewScanner(os.Stdin)
 
-	env := NewEnvironment()
+	env := evaluator.NewEnvironment()
 
 	for {
 		fmt.Print("> ")
@@ -18,14 +21,14 @@ func RunREPL() {
 		}
 		input := scanner.Text()
 
-		program, err := Parse(input)
+		program, err := parser.Parse(input)
 
 		if err != nil {
 			fmt.Println("Error:", err)
 			continue
 		}
 
-		result, err := EvalProgram(program, env)
+		result, err := evaluator.EvalProgram(program, env)
 
 		if err != nil {
 			fmt.Println("Error:", err)

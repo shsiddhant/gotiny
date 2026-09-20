@@ -1,34 +1,37 @@
-package main
+package evaluator
 
 import (
 	"testing"
+
+	"github.com/shsiddhant/gotiny/internal/objects"
+	"github.com/shsiddhant/gotiny/internal/parser"
 )
 
 func TestEval(t *testing.T) {
 	tests := []struct {
 		input    string
-		expected Value
+		expected objects.Value
 	}{
-		{"1;", Int(1)},
-		{"-1;", Int(-1)},
-		{"+1;", Int(1)},
-		{"--1;", Int(1)},
-		{"-+1;", Int(-1)},
-		{"2 + -5;", Int(-3)},
-		{"2 * -3;", Int(-6)},
-		{"-2 * 3;", Int(-6)},
-		{"-5 / 3;", Int(-1)},
-		{"-(1 + 2);", Int(-3)},
-		{"1 + 2;", Int(3)},
-		{"2 * 3;", Int(6)},
-		{"1 + 2 * 3;", Int(7)},
-		{"(1 + 2) * 3;", Int(9)},
-		{"20 / 5 / 2;", Int(2)},
-		{"10 - 3 - 2;", Int(5)},
+		{"1;", objects.Int(1)},
+		{"-1;", objects.Int(-1)},
+		{"+1;", objects.Int(1)},
+		{"--1;", objects.Int(1)},
+		{"-+1;", objects.Int(-1)},
+		{"2 + -5;", objects.Int(-3)},
+		{"2 * -3;", objects.Int(-6)},
+		{"-2 * 3;", objects.Int(-6)},
+		{"-5 / 3;", objects.Int(-1)},
+		{"-(1 + 2);", objects.Int(-3)},
+		{"1 + 2;", objects.Int(3)},
+		{"2 * 3;", objects.Int(6)},
+		{"1 + 2 * 3;", objects.Int(7)},
+		{"(1 + 2) * 3;", objects.Int(9)},
+		{"20 / 5 / 2;", objects.Int(2)},
+		{"10 - 3 - 2;", objects.Int(5)},
 	}
 
 	for _, tt := range tests {
-		program, err := Parse(tt.input)
+		program, err := parser.Parse(tt.input)
 		if err != nil {
 			t.Fatalf("%q: parse error: %v", tt.input, err)
 		}
@@ -47,7 +50,7 @@ func TestEval(t *testing.T) {
 }
 
 func TestEvalDivisionByZero(t *testing.T) {
-	program, err := Parse("10 / 0;")
+	program, err := parser.Parse("10 / 0;")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -63,12 +66,12 @@ func TestEvalDivisionByZero(t *testing.T) {
 func TestEvalVariable(t *testing.T) {
 	env := NewEnvironment()
 
-	value := Int(1712)
-	expected := Int(-17)
+	value := objects.Int(1712)
+	expected := objects.Int(-17)
 
 	env.Set("x", value)
 
-	program, err := Parse("x + -1729;")
+	program, err := parser.Parse("x + -1729;")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -86,7 +89,7 @@ func TestEvalVariable(t *testing.T) {
 func TestEvalUndefinedVariable(t *testing.T) {
 	env := NewEnvironment()
 
-	program, err := Parse("x;")
+	program, err := parser.Parse("x;")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,7 +103,7 @@ func TestEvalUndefinedVariable(t *testing.T) {
 func TestEvalLetStmt(t *testing.T) {
 	env := NewEnvironment()
 
-	program, err := Parse("let x = 3;")
+	program, err := parser.Parse("let x = 3;")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -110,7 +113,7 @@ func TestEvalLetStmt(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	program2, err := Parse("x*x + 1;")
+	program2, err := parser.Parse("x*x + 1;")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -120,13 +123,13 @@ func TestEvalLetStmt(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if got != Int(10) {
+	if got != objects.Int(10) {
 		t.Errorf("%q: got %d, expected %d", program2, got, 10)
 	}
 }
 
 func TestEvalProgram(t *testing.T) {
-	program, err := Parse(`
+	program, err := parser.Parse(`
 	let x = 1712;
 	let y = -1729;
 	y = x + 2 * y;
@@ -143,7 +146,7 @@ func TestEvalProgram(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if got != Int(-34) {
+	if got != objects.Int(-34) {
 		t.Errorf("got %d, expected -34", got)
 	}
 
@@ -152,7 +155,7 @@ func TestEvalProgram(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if x != Int(1712) {
+	if x != objects.Int(1712) {
 		t.Errorf("x = %d, expected 1712", x)
 	}
 
@@ -161,14 +164,14 @@ func TestEvalProgram(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if y != Int(-1746) {
+	if y != objects.Int(-1746) {
 		t.Errorf("x = %d, expected -1746", y)
 	}
 
 }
 
 func TestEvalProgramUsesPreviousStatements(t *testing.T) {
-	program, err := Parse(`
+	program, err := parser.Parse(`
         let x = 1712;
         x + 1205;
         x - 1729;
@@ -184,13 +187,13 @@ func TestEvalProgramUsesPreviousStatements(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if got != Int(-17) {
+	if got != objects.Int(-17) {
 		t.Errorf("got %d, expected -17", got)
 	}
 }
 
 func TestEvalEmptyProgram(t *testing.T) {
-	program, err := Parse("")
+	program, err := parser.Parse("")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -215,7 +218,7 @@ func TestEvalTypeErrors(t *testing.T) {
 	}
 
 	for _, input := range tests {
-		program, err := Parse(input)
+		program, err := parser.Parse(input)
 		if err != nil {
 			t.Fatalf("%q: parse error: %v", input, err)
 		}

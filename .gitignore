@@ -33,3 +33,6 @@ go.work.sum
 
 # Git export files
 *.diff
+
+# Built binaries
+bin/
