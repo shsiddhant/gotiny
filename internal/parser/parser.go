@@ -215,7 +215,7 @@ func (p *Parser) exprStatement() (ast.Stmt, error) {
 }
 
 func (p *Parser) assignStatement() (ast.Stmt, error) {
-	name := p.current.Value
+	name := p.current
 	if err := p.consume(token.Identifier); err != nil {
 		return nil, err
 	}
@@ -237,7 +237,7 @@ func (p *Parser) letStatement() (ast.Stmt, error) {
 	if err := p.consume(token.Let); err != nil {
 		return nil, err
 	}
-	name := p.current.Value
+	name := p.current
 	if err := p.consume(token.Identifier); err != nil {
 		return nil, err
 	}

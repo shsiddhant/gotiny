@@ -14,7 +14,7 @@ func evalAssignStmt(stmt *ast.AssignStmt, env *Environment) (objects.Value, erro
 		return nil, err
 	}
 
-	return nil, env.Assign(stmt.Name, value)
+	return nil, env.Assign(stmt.Name.Value, value)
 }
 
 func evalLetStmt(stmt *ast.LetStmt, env *Environment) (objects.Value, error) {
@@ -24,7 +24,7 @@ func evalLetStmt(stmt *ast.LetStmt, env *Environment) (objects.Value, error) {
 		return nil, err
 	}
 
-	return nil, env.Define(stmt.Name, value)
+	return nil, env.Define(stmt.Name.Value, value)
 }
 
 func EvalStmt(stmt ast.Stmt, env *Environment) (objects.Value, error) {

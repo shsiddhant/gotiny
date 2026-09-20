@@ -1,6 +1,10 @@
 package ast
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/shsiddhant/gotiny/internal/token"
+)
 
 // Statement interface
 type Stmt interface {
@@ -29,14 +33,14 @@ func (s ExprStmt) String() string {
 //
 //	`z = x + 1729 * y;`
 type AssignStmt struct {
-	Name  string
+	Name  token.Token
 	Value Expr
 }
 
 func (s AssignStmt) stmt() {}
 
 func (s AssignStmt) String() string {
-	return fmt.Sprintf("%s = %s", s.Name, s.Value)
+	return fmt.Sprintf("%s = %s", s.Name.Value, s.Value)
 }
 
 // Let Statement for variable declaration.
@@ -45,14 +49,14 @@ func (s AssignStmt) String() string {
 //
 //	`let x = 1712;`
 type LetStmt struct {
-	Name  string
+	Name  token.Token
 	Value Expr
 }
 
 func (s LetStmt) stmt() {}
 
 func (s LetStmt) String() string {
-	return fmt.Sprintf("let %s = %s", s.Name, s.Value)
+	return fmt.Sprintf("let %s = %s", s.Name.Value, s.Value)
 }
 
 // BlockStmt represents a block of statement inside curly braces.
