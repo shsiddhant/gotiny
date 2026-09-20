@@ -34,10 +34,12 @@ const (
 )
 
 type Token struct {
-	Type  TokenType
-	Value string
+	Type   TokenType
+	Value  string
+	Line   int
+	Column int
 }
 
 func (token Token) String() string {
-	return fmt.Sprintf("%s(%s)", token.Type, token.Value)
+	return fmt.Sprintf("%d:%d:%s(%s)", token.Line, token.Column, token.Type, token.Value)
 }

@@ -10,10 +10,12 @@ type Lexer struct {
 	source  []rune
 	start   int
 	current int
+	line    int
+	column  int
 }
 
 func NewLexer(source string) *Lexer {
-	return &Lexer{source: []rune(source)}
+	return &Lexer{source: []rune(source), line: 1, column: 1}
 }
 
 func (l *Lexer) isAtEnd() bool {
@@ -23,6 +25,12 @@ func (l *Lexer) isAtEnd() bool {
 func (l *Lexer) advance() rune {
 	ch := l.source[l.current]
 	l.current++
+	if ch == '\n' {
+		l.line++
+		l.column = 1
+	} else {
+		l.column++
+	}
 	return ch
 }
 
@@ -48,14 +56,16 @@ func isDigit(c rune) bool {
 	return c >= '0' && c <= '9'
 }
 
-func (l *Lexer) number() token.Token {
+func (l *Lexer) number(line int, column int) token.Token {
 	for isDigit(l.peek()) {
 		l.advance()
 	}
 
 	return token.Token{
-		Type:  token.Number,
-		Value: string(l.source[l.start:l.current]),
+		Type:   token.Number,
+		Value:  string(l.source[l.start:l.current]),
+		Line:   line,
+		Column: column,
 	}
 }
 
@@ -67,7 +77,7 @@ func isIdentifierPart(c rune) bool {
 	return isLetter(c) || isDigit(c)
 }
 
-func (l *Lexer) identifierOrKeyword() token.Token {
+func (l *Lexer) identifierOrKeyword(line int, column int) token.Token {
 	for isIdentifierPart(l.peek()) {
 		l.advance()
 	}
@@ -76,23 +86,28 @@ func (l *Lexer) identifierOrKeyword() token.Token {
 
 	if tokenType, ok := keywords[value]; ok {
 		return token.Token{
-			Type:  tokenType,
-			Value: value,
+			Type:   tokenType,
+			Value:  value,
+			Line:   line,
+			Column: column,
 		}
 	}
 
 	return token.Token{
-		Type:  token.Identifier,
-		Value: value,
+		Type:   token.Identifier,
+		Value:  value,
+		Line:   line,
+		Column: column,
 	}
 }
 
 func (l *Lexer) Next() (token.Token, error) {
 	l.skipWhitespace()
 	l.start = l.current
+	line, column := l.line, l.column
 
 	if l.isAtEnd() {
-		return token.Token{Type: token.EOF}, nil
+		return token.Token{Type: token.EOF, Line: line, Column: column}, nil
 	}
 
 	c := l.advance()
@@ -100,38 +115,38 @@ func (l *Lexer) Next() (token.Token, error) {
 	switch c {
 	//Operators
 	case '+':
-		return token.Token{Type: token.Plus, Value: "+"}, nil
+		return token.Token{Type: token.Plus, Value: "+", Line: line, Column: column}, nil
 	case '-':
-		return token.Token{Type: token.Minus, Value: "-"}, nil
+		return token.Token{Type: token.Minus, Value: "-", Line: line, Column: column}, nil
 	case '*':
-		return token.Token{Type: token.Star, Value: "*"}, nil
+		return token.Token{Type: token.Star, Value: "*", Line: line, Column: column}, nil
 	case '/':
-		return token.Token{Type: token.Slash, Value: "/"}, nil
+		return token.Token{Type: token.Slash, Value: "/", Line: line, Column: column}, nil
 	case '=':
-		return token.Token{Type: token.Equal, Value: "="}, nil
+		return token.Token{Type: token.Equal, Value: "=", Line: line, Column: column}, nil
 
 	// Delimiters
 	case ';':
-		return token.Token{Type: token.SemiColon, Value: ";"}, nil
+		return token.Token{Type: token.SemiColon, Value: ";", Line: line, Column: column}, nil
 	case '(':
-		return token.Token{Type: token.LeftParen, Value: "("}, nil
+		return token.Token{Type: token.LeftParen, Value: "(", Line: line, Column: column}, nil
 	case ')':
-		return token.Token{Type: token.RightParen, Value: ")"}, nil
+		return token.Token{Type: token.RightParen, Value: ")", Line: line, Column: column}, nil
 	case '{':
-		return token.Token{Type: token.LeftCurlyBrace, Value: "{"}, nil
+		return token.Token{Type: token.LeftCurlyBrace, Value: "{", Line: line, Column: column}, nil
 	case '}':
-		return token.Token{Type: token.RightCurlyBrace, Value: "}"}, nil
+		return token.Token{Type: token.RightCurlyBrace, Value: "}", Line: line, Column: column}, nil
 	}
 
 	if isDigit(c) {
-		return l.number(), nil
+		return l.number(line, column), nil
 	}
 
 	if isLetter(c) {
-		return l.identifierOrKeyword(), nil
+		return l.identifierOrKeyword(line, column), nil
 	}
 
-	return token.Token{}, fmt.Errorf("unexpected character: %q", c)
+	return token.Token{Line: line, Column: column}, fmt.Errorf("unexpected character: %q", c)
 }
 
 var keywords = map[string]token.TokenType{
