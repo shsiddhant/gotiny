@@ -28,6 +28,13 @@ func TestEval(t *testing.T) {
 		{"(1 + 2) * 3;", objects.Int(9)},
 		{"20 / 5 / 2;", objects.Int(2)},
 		{"10 - 3 - 2;", objects.Int(5)},
+		{"1 > 2;", objects.Bool(false)},
+		{"1 > 2 == true;", objects.Bool(false)},
+		{"let x = 1712; let y = 1729; x <= y;", objects.Bool(true)},
+		{"let x = 1712; x <= x;", objects.Bool(true)},
+		{"1205 < 1205;", objects.Bool(false)},
+		{"1 != 2;", objects.Bool(true)},
+		{"1 != 2 == true != false;", objects.Bool(true)},
 	}
 
 	for _, tt := range tests {
@@ -44,7 +51,7 @@ func TestEval(t *testing.T) {
 		}
 
 		if got != tt.expected {
-			t.Errorf("%q: got %d, expected %d", tt.input, got, tt.expected)
+			t.Errorf("%q: got %s, expected %s", tt.input, got, tt.expected)
 		}
 	}
 }

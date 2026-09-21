@@ -34,10 +34,85 @@ func evalUnary(expr *ast.UnaryExpr, env *Environment) (objects.Value, error) {
 		return nil, &EvalError{
 			Line:    expr.Operator.Line,
 			Column:  expr.Operator.Column,
-			Message: fmt.Sprintf("Invalid unary operator %s", expr.Operator),
+			Message: fmt.Sprintf("invalid unary operator %s", expr.Operator),
 		}
 	}
 
+}
+
+func evalIntBinary(left, right objects.Value, operator token.Token) (objects.Value, error) {
+
+	if left.Type() != objects.IntType || right.Type() != objects.IntType {
+		return nil, &EvalError{
+			Line:   operator.Line,
+			Column: operator.Column,
+			Message: fmt.Sprintf(
+				"binary operator %q cannot be applied to %s and %s",
+				operator.Value,
+				left.Type(),
+				right.Type(),
+			),
+		}
+	}
+
+	leftInt, rightInt := left.(objects.Int), right.(objects.Int)
+	switch operator.Type {
+	case token.Plus:
+		return leftInt + rightInt, nil
+	case token.Minus:
+		return leftInt - rightInt, nil
+	case token.Star:
+		return leftInt * rightInt, nil
+	case token.Slash:
+		if right == objects.Int(0) {
+			return nil, &EvalError{
+				Line:    operator.Line,
+				Column:  operator.Column,
+				Message: "division by zero",
+			}
+		}
+		return leftInt / rightInt, nil
+	case token.Less:
+		return objects.Bool(leftInt < rightInt), nil
+	case token.LessEqual:
+		return objects.Bool(leftInt <= rightInt), nil
+	case token.Greater:
+		return objects.Bool(leftInt > rightInt), nil
+	case token.GreaterEqual:
+		return objects.Bool(leftInt >= rightInt), nil
+	default:
+		return nil, &EvalError{
+			Line:    operator.Line,
+			Column:  operator.Column,
+			Message: fmt.Sprintf("invalid Int binary operator %q", operator.Value),
+		}
+	}
+}
+
+func evalEquality(left, right objects.Value, operator token.Token) (objects.Value, error) {
+	if left.Type() != right.Type() {
+		return nil, &EvalError{
+			Line:   operator.Line,
+			Column: operator.Column,
+			Message: fmt.Sprintf(
+				"cannot compare %s and %s",
+				left.Type(),
+				right.Type(),
+			),
+		}
+	}
+	switch operator.Type {
+	case token.EqualEqual:
+		return objects.Bool(left == right), nil
+	case token.NotEqual:
+		return objects.Bool(left != right), nil
+	default:
+		return nil, &EvalError{
+			Line:    operator.Line,
+			Column:  operator.Column,
+			Message: fmt.Sprintf("invalid comparison operator %q", operator.Value),
+		}
+	}
 }
 
 func evalBinary(expr *ast.BinaryExpr, env *Environment) (objects.Value, error) {
@@ -52,43 +127,18 @@ func evalBinary(expr *ast.BinaryExpr, env *Environment) (objects.Value, error) {
 		return nil, err
 	}
 
-	if left.Type() != objects.IntType || right.Type() != objects.IntType {
-		return nil, &EvalError{
-			Line:   expr.Operator.Line,
-			Column: expr.Operator.Column,
-			Message: fmt.Sprintf(
-				"binary operator %q cannot be applied to %s and %s",
-				expr.Operator.Value,
-				left.Type(),
-				right.Type(),
-			),
-		}
-	}
-
-	leftInt, rightInt := left.(objects.Int), right.(objects.Int)
-
 	switch expr.Operator.Type {
-	case token.Plus:
-		return leftInt + rightInt, nil
-	case token.Minus:
-		return leftInt - rightInt, nil
-	case token.Star:
-		return leftInt * rightInt, nil
-	case token.Slash:
-		if right == objects.Int(0) {
-			return nil, &EvalError{
-				Line:    expr.Operator.Line,
-				Column:  expr.Operator.Column,
-				Message: "division by zero",
-			}
-		}
-		return leftInt / rightInt, nil
+	case token.Plus, token.Minus, token.Star, token.Slash, token.Less, token.LessEqual, token.Greater, token.GreaterEqual:
+		return evalIntBinary(left, right, expr.Operator)
+	case token.EqualEqual, token.NotEqual:
+		return evalEquality(left, right, expr.Operator)
 	default:
 		return nil, &EvalError{
 			Line:    expr.Operator.Line,
 			Column:  expr.Operator.Column,
-			Message: fmt.Sprintf("Invalid binary operator %s", expr.Operator),
+			Message: fmt.Sprintf("invalid binary operator %s", expr.Operator),
 		}
+
 	}
 }
 
