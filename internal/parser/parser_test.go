@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/shsiddhant/gotiny/internal/ast"
+	"github.com/shsiddhant/gotiny/internal/token"
 )
 
 func TestParser(t *testing.T) {
@@ -457,6 +458,66 @@ func TestParserMalformedInEquality(t *testing.T) {
 	}
 	if parseErr.Token.Value != "==" {
 		t.Fatalf("expected parse error for token value \"==\", got %q", parseErr.Token.Value)
+	}
+
+}
+
+func TestParserBooleanAnd(t *testing.T) {
+
+	program, err := Parse("x && 1;")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(program.Statements) != 1 {
+		t.Fatalf("got %d statements, expected 1", len(program.Statements))
+	}
+
+	exprStmt, ok := program.Statements[0].(*ast.ExprStmt)
+	if !ok {
+		t.Fatalf("expected an expression statement, got %T", program.Statements[0])
+	}
+	binaryExpr, ok := exprStmt.Expression.(*ast.BinaryExpr)
+	if !ok {
+		t.Fatalf("expected a binary expression, got %T", exprStmt.Expression)
+	}
+	if binaryExpr.String() != "(x && 1)" {
+		t.Errorf("expected expression (x && 1), got %s", binaryExpr)
+	}
+
+}
+
+func TestParserPrecedence(t *testing.T) {
+	program, err := Parse("x == 1 || !y && z > 1712;")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(program.Statements) != 1 {
+		t.Fatalf("got %d statements, expected 1", len(program.Statements))
+	}
+
+	exprStmt, ok := program.Statements[0].(*ast.ExprStmt)
+	if !ok {
+		t.Fatalf("expected an expression statement, got %T", program.Statements[0])
+	}
+	binaryExpr, ok := exprStmt.Expression.(*ast.BinaryExpr)
+	if !ok {
+		t.Fatalf("expected a binary expression, got %T", exprStmt.Expression)
+	}
+
+	if binaryExpr.Operator.Type != token.Or {
+		t.Fatalf("expected operator %s, got %s", token.Or, binaryExpr.Operator.Type)
+	}
+	left, ok := binaryExpr.Left.(*ast.BinaryExpr)
+	if !ok {
+		t.Fatalf("expected a binary expression on left, got %T", binaryExpr.Left)
+	}
+	if left.Operator.Type != token.EqualEqual {
+		t.Fatalf("expected operator %s, got %s", token.EqualEqual, left.Operator.Type)
+	}
+
+	if binaryExpr.String() != "((x == 1) || ((!y) && (z > 1712)))" {
+		t.Log(binaryExpr.Operator)
+		t.Errorf("expected expression (x && 1), got %s", binaryExpr)
 	}
 
 }

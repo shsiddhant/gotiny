@@ -35,6 +35,20 @@ func TestEval(t *testing.T) {
 		{"1205 < 1205;", objects.Bool(false)},
 		{"1 != 2;", objects.Bool(true)},
 		{"1 != 2 == true != false;", objects.Bool(true)},
+		{"!true;", objects.Bool(false)},
+		{"!false;", objects.Bool(true)},
+		{"!!true;", objects.Bool(true)},
+		{"true && false;", objects.Bool(false)},
+		{"true && true;", objects.Bool(true)},
+		{"false || true;", objects.Bool(true)},
+		{"false || false;", objects.Bool(false)},
+		{"!false && true;", objects.Bool(true)},
+		{"true || false && false;", objects.Bool(true)},
+		{"false && true || true;", objects.Bool(true)},
+		{"1 < 2 && 3 > 4;", objects.Bool(false)},
+		{"let x = 5; x > 3 && x < 10;", objects.Bool(true)},
+		{"false && (1 / 0 == 0);", objects.Bool(false)},
+		{"true || (1 / 0 == 0);", objects.Bool(true)},
 	}
 
 	for _, tt := range tests {

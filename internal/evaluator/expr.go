@@ -17,13 +17,13 @@ func evalUnary(expr *ast.UnaryExpr, env *Environment) (objects.Value, error) {
 		return nil, err
 	}
 
-	value := operandEval.(objects.Int)
-
 	switch expr.Operator.Type {
 	case token.Plus:
-		return value, nil
+		return operandEval.(objects.Int), nil
 	case token.Minus:
-		return -value, nil
+		return -operandEval.(objects.Int), nil
+	case token.Not:
+		return !operandEval.(objects.Bool), nil
 	default:
 		return nil, &EvalError{
 			Line:    expr.Operator.Line,
@@ -92,16 +92,37 @@ func evalBinary(expr *ast.BinaryExpr, env *Environment) (objects.Value, error) {
 		return nil, err
 	}
 
-	right, err := EvalExpr(expr.Right, env)
-	if err != nil {
-		return nil, err
-	}
-
 	switch expr.Operator.Type {
 	case token.Plus, token.Minus, token.Star, token.Slash, token.Less, token.LessEqual, token.Greater, token.GreaterEqual:
+		right, err := EvalExpr(expr.Right, env)
+		if err != nil {
+			return nil, err
+		}
 		return evalIntBinary(left, right, expr.Operator)
 	case token.EqualEqual, token.NotEqual:
+		right, err := EvalExpr(expr.Right, env)
+		if err != nil {
+			return nil, err
+		}
 		return evalEquality(left, right, expr.Operator)
+	case token.And:
+		if !left.(objects.Bool) {
+			return objects.Bool(false), nil
+		}
+		right, err := EvalExpr(expr.Right, env)
+		if err != nil {
+			return nil, err
+		}
+		return right.(objects.Bool), nil
+	case token.Or:
+		if left.(objects.Bool) {
+			return objects.Bool(true), nil
+		}
+		right, err := EvalExpr(expr.Right, env)
+		if err != nil {
+			return nil, err
+		}
+		return right.(objects.Bool), nil
 	default:
 		return nil, &EvalError{
 			Line:    expr.Operator.Line,

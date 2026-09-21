@@ -28,17 +28,19 @@ func _() {
 	_ = x[GreaterEqual-17]
 	_ = x[EqualEqual-18]
 	_ = x[NotEqual-19]
-	_ = x[Not-20]
-	_ = x[SemiColon-21]
-	_ = x[LeftParen-22]
-	_ = x[RightParen-23]
-	_ = x[LeftCurlyBrace-24]
-	_ = x[RightCurlyBrace-25]
+	_ = x[And-20]
+	_ = x[Or-21]
+	_ = x[Not-22]
+	_ = x[SemiColon-23]
+	_ = x[LeftParen-24]
+	_ = x[RightParen-25]
+	_ = x[LeftCurlyBrace-26]
+	_ = x[RightCurlyBrace-27]
 }
 
-const _TokenType_name = "InvalidTokenEOFNumberIdentifierLetTrueFalseIfElsePlusMinusStarSlashEqualLessLessEqualGreaterGreaterEqualEqualEqualNotEqualNotSemiColonLeftParenRightParenLeftCurlyBraceRightCurlyBrace"
+const _TokenType_name = "InvalidTokenEOFNumberIdentifierLetTrueFalseIfElsePlusMinusStarSlashEqualLessLessEqualGreaterGreaterEqualEqualEqualNotEqualAndOrNotSemiColonLeftParenRightParenLeftCurlyBraceRightCurlyBrace"
 
-var _TokenType_index = [...]uint8{0, 12, 15, 21, 31, 34, 38, 43, 45, 49, 53, 58, 62, 67, 72, 76, 85, 92, 104, 114, 122, 125, 134, 143, 153, 167, 182}
+var _TokenType_index = [...]uint8{0, 12, 15, 21, 31, 34, 38, 43, 45, 49, 53, 58, 62, 67, 72, 76, 85, 92, 104, 114, 122, 125, 127, 130, 139, 148, 158, 172, 187}
 
 func (i TokenType) String() string {
 	idx := int(i) - 0

@@ -203,3 +203,38 @@ a > b
 		}
 	}
 }
+
+func TestLexerBoolean(t *testing.T) {
+	lexer := NewLexer(`x == 1 && y`)
+
+	expected := []token.Token{
+		{Type: token.Identifier, Value: "x", Line: 1, Column: 1},
+		{Type: token.EqualEqual, Value: "==", Line: 1, Column: 3},
+		{Type: token.Number, Value: "1", Line: 1, Column: 6},
+		{Type: token.And, Value: "&&", Line: 1, Column: 8},
+		{Type: token.Identifier, Value: "y", Line: 1, Column: 11},
+		{Type: token.EOF, Line: 1, Column: 12},
+	}
+
+	for i := 0; ; i++ {
+		got, err := lexer.Next()
+		if err != nil {
+			t.Fatalf("token %d: unexpected error: %v", i, err)
+		}
+
+		if i >= len(expected) {
+			t.Fatalf("lexer produced unexpected token: %v", got)
+		}
+
+		if got != expected[i] {
+			t.Errorf("token %d: got %v, expected %v", i, got, expected[i])
+		}
+
+		if got.Type == token.EOF {
+			if i != len(expected)-1 {
+				t.Errorf("lexer reached EOF early: got %d tokens, expected %d", i+1, len(expected))
+			}
+			break
+		}
+	}
+}

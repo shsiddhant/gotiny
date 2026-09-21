@@ -60,7 +60,13 @@ func checkAssignStmt(stmt *ast.AssignStmt, env *TypeEnvironment) error {
 	if err != nil {
 		return err
 	}
-	return env.Assign(stmt.Name.Value, typ)
+	if err := env.Assign(stmt.Name.Value, typ); err != nil {
+		return &CheckError{
+			Token:   stmt.Name,
+			Message: err.Error(),
+		}
+	}
+	return nil
 
 }
 
@@ -69,7 +75,13 @@ func checkLetStmt(stmt *ast.LetStmt, env *TypeEnvironment) error {
 	if err != nil {
 		return err
 	}
-	return env.Define(stmt.Name.Value, typ)
+	if err := env.Define(stmt.Name.Value, typ); err != nil {
+		return &CheckError{
+			Token:   stmt.Name,
+			Message: err.Error(),
+		}
+	}
+	return nil
 }
 
 func typeOfExpr(expr ast.Expr, env *TypeEnvironment) (objects.Type, error) {
@@ -103,17 +115,25 @@ func typeOfUnary(expr *ast.UnaryExpr, env *TypeEnvironment) (objects.Type, error
 		return 0, err
 	}
 
-	if operandType != objects.IntType {
-		return 0, &CheckError{
-			Token: expr.Operator,
-			Message: fmt.Sprintf(
-				"unary operator %q cannot be applied to %s", expr.Operator.Value, operandType),
-		}
-	}
-
 	switch expr.Operator.Type {
 	case token.Plus, token.Minus:
+		if operandType != objects.IntType {
+			return 0, &CheckError{
+				Token: expr.Operator,
+				Message: fmt.Sprintf(
+					"unary operator %q cannot be applied to %s", expr.Operator.Value, operandType),
+			}
+		}
 		return operandType, nil
+	case token.Not:
+		if operandType != objects.BoolType {
+			return 0, &CheckError{
+				Token: expr.Operator,
+				Message: fmt.Sprintf(
+					"unary operator %q cannot be applied to %s", expr.Operator.Value, operandType),
+			}
+		}
+		return objects.BoolType, nil
 	default:
 		return 0, &CheckError{
 			Token:   expr.Operator,
@@ -173,7 +193,19 @@ func typeOfBinary(expr *ast.BinaryExpr, env *TypeEnvironment) (objects.Type, err
 			}
 		}
 		return objects.BoolType, nil
-
+	case token.And, token.Or:
+		if leftType != objects.BoolType || rightType != objects.BoolType {
+			return 0, &CheckError{
+				Token: expr.Operator,
+				Message: fmt.Sprintf(
+					"binary operator %q cannot be applied to %s and %s",
+					expr.Operator.Value,
+					leftType,
+					rightType,
+				),
+			}
+		}
+		return objects.BoolType, nil
 	default:
 		return 0, &CheckError{
 			Token:   expr.Operator,

@@ -68,7 +68,7 @@ func (p *Parser) consume(kind token.TokenType) error {
 }
 
 func (p *Parser) expression() (ast.Expr, error) {
-	return p.equality()
+	return p.booleanOr()
 }
 
 func (p *Parser) primary() (ast.Expr, error) {
@@ -132,7 +132,7 @@ func (p *Parser) primary() (ast.Expr, error) {
 }
 
 func (p *Parser) unary() (ast.Expr, error) {
-	if p.current.Type == token.Plus || p.current.Type == token.Minus {
+	if p.current.Type == token.Plus || p.current.Type == token.Minus || p.current.Type == token.Not {
 		operator := p.current
 
 		if err := p.advance(); err != nil {
@@ -250,6 +250,62 @@ func (p *Parser) equality() (ast.Expr, error) {
 		}
 
 		right, err := p.comparison()
+		if err != nil {
+			return nil, err
+		}
+
+		expr = &ast.BinaryExpr{
+			Left:     expr,
+			Operator: operator,
+			Right:    right,
+		}
+	}
+	return expr, nil
+}
+
+func (p *Parser) booleanAnd() (ast.Expr, error) {
+	expr, err := p.equality()
+	if err != nil {
+		return nil, err
+	}
+
+	for p.current.Type == token.And {
+
+		operator := p.current
+
+		if err := p.advance(); err != nil {
+			return nil, err
+		}
+
+		right, err := p.equality()
+		if err != nil {
+			return nil, err
+		}
+
+		expr = &ast.BinaryExpr{
+			Left:     expr,
+			Operator: operator,
+			Right:    right,
+		}
+	}
+	return expr, nil
+}
+
+func (p *Parser) booleanOr() (ast.Expr, error) {
+	expr, err := p.booleanAnd()
+	if err != nil {
+		return nil, err
+	}
+
+	for p.current.Type == token.Or {
+
+		operator := p.current
+
+		if err := p.advance(); err != nil {
+			return nil, err
+		}
+
+		right, err := p.booleanAnd()
 		if err != nil {
 			return nil, err
 		}

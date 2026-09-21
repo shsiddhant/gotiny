@@ -39,7 +39,9 @@ const (
 	EqualEqual // ==
 	NotEqual   // !=
 
-	// Not
+	// Boolean
+	And // &&
+	Or  // ||
 	Not // !
 
 	// Delimiters

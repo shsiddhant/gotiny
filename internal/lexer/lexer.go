@@ -146,7 +146,20 @@ func (l *Lexer) Next() (token.Token, error) {
 			return token.Token{Type: token.NotEqual, Value: "!=", Line: line, Column: column}, nil
 		}
 		return token.Token{Type: token.Not, Value: "!", Line: line, Column: column}, nil
-
+	case '&':
+		peek := l.peek()
+		if l.peek() == '&' {
+			l.advance()
+			return token.Token{Type: token.And, Value: "&&", Line: line, Column: column}, nil
+		}
+		return token.Token{Line: line, Column: column}, fmt.Errorf("expected '&', got '%c'", peek)
+	case '|':
+		peek := l.peek()
+		if l.peek() == '|' {
+			l.advance()
+			return token.Token{Type: token.Or, Value: "||", Line: line, Column: column}, nil
+		}
+		return token.Token{Line: line, Column: column}, fmt.Errorf("expected '|', got '%c'", peek)
 	// Delimiters
 	case ';':
 		return token.Token{Type: token.SemiColon, Value: ";", Line: line, Column: column}, nil
