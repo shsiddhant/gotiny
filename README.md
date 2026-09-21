@@ -38,7 +38,7 @@ Custom error types track exact line and column numbers for syntax, type, and run
 ## Installation
 
 ```
-go install github.com/shsiddhant/gotiny@latest
+go install github.com/shsiddhant/gotiny/cmd/gotiny@latest
 ```
 
 ## Usage
