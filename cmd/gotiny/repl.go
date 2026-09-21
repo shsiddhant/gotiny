@@ -13,6 +13,7 @@ func runREPL() {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	env := evaluator.NewEnvironment()
+	typeEnv := evaluator.NewTypeEnvironment()
 
 	for {
 		fmt.Print("> ")
@@ -28,7 +29,7 @@ func runREPL() {
 			continue
 		}
 
-		result, err := evaluator.EvalProgram(program, env)
+		result, err := evaluator.EvalProgram(program, env, typeEnv)
 
 		if err != nil {
 			fmt.Println("Error:", err)

@@ -8,6 +8,8 @@ import (
 	"github.com/shsiddhant/gotiny/internal/token"
 )
 
+// Note: eval* functions now assume type checks have already been done.
+
 func evalUnary(expr *ast.UnaryExpr, env *Environment) (objects.Value, error) {
 	operandEval, err := EvalExpr(expr.Operand, env)
 
@@ -15,15 +17,7 @@ func evalUnary(expr *ast.UnaryExpr, env *Environment) (objects.Value, error) {
 		return nil, err
 	}
 
-	value, ok := operandEval.(objects.Int)
-	if !ok {
-		return nil, &EvalError{
-			Line:   expr.Operator.Line,
-			Column: expr.Operator.Column,
-			Message: fmt.Sprintf(
-				"unary operator %q cannot be applied to %s", expr.Operator.Value, operandEval.Type()),
-		}
-	}
+	value := operandEval.(objects.Int)
 
 	switch expr.Operator.Type {
 	case token.Plus:
@@ -41,19 +35,6 @@ func evalUnary(expr *ast.UnaryExpr, env *Environment) (objects.Value, error) {
 }
 
 func evalIntBinary(left, right objects.Value, operator token.Token) (objects.Value, error) {
-
-	if left.Type() != objects.IntType || right.Type() != objects.IntType {
-		return nil, &EvalError{
-			Line:   operator.Line,
-			Column: operator.Column,
-			Message: fmt.Sprintf(
-				"binary operator %q cannot be applied to %s and %s",
-				operator.Value,
-				left.Type(),
-				right.Type(),
-			),
-		}
-	}
 
 	leftInt, rightInt := left.(objects.Int), right.(objects.Int)
 	switch operator.Type {
@@ -90,17 +71,6 @@ func evalIntBinary(left, right objects.Value, operator token.Token) (objects.Val
 }
 
 func evalEquality(left, right objects.Value, operator token.Token) (objects.Value, error) {
-	if left.Type() != right.Type() {
-		return nil, &EvalError{
-			Line:   operator.Line,
-			Column: operator.Column,
-			Message: fmt.Sprintf(
-				"cannot compare %s and %s",
-				left.Type(),
-				right.Type(),
-			),
-		}
-	}
 	switch operator.Type {
 	case token.EqualEqual:
 		return objects.Bool(left == right), nil

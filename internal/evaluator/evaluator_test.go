@@ -44,8 +44,9 @@ func TestEval(t *testing.T) {
 		}
 
 		env := NewEnvironment()
+		typeEnv := NewTypeEnvironment()
 
-		got, err := EvalProgram(program, env)
+		got, err := EvalProgram(program, env, typeEnv)
 		if err != nil {
 			t.Fatalf("%q: evaluation error: %v", tt.input, err)
 		}
@@ -63,8 +64,9 @@ func TestEvalDivisionByZero(t *testing.T) {
 	}
 
 	env := NewEnvironment()
+	typeEnv := NewTypeEnvironment()
 
-	_, err = EvalProgram(program, env)
+	_, err = EvalProgram(program, env, typeEnv)
 	if err == nil {
 		t.Fatal("expected division by zero error")
 	}
@@ -72,18 +74,20 @@ func TestEvalDivisionByZero(t *testing.T) {
 
 func TestEvalVariable(t *testing.T) {
 	env := NewEnvironment()
+	typeEnv := NewTypeEnvironment()
 
 	value := objects.Int(1712)
 	expected := objects.Int(-17)
 
 	env.Set("x", value)
+	typeEnv.Set("x", objects.IntType)
 
 	program, err := parser.Parse("x + -1729;")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	got, err := EvalProgram(program, env)
+	got, err := EvalProgram(program, env, typeEnv)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -95,13 +99,14 @@ func TestEvalVariable(t *testing.T) {
 
 func TestEvalUndefinedVariable(t *testing.T) {
 	env := NewEnvironment()
+	typeEnv := NewTypeEnvironment()
 
 	program, err := parser.Parse("x;")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = EvalProgram(program, env)
+	_, err = EvalProgram(program, env, typeEnv)
 	if err == nil {
 		t.Fatal("expected undefined variable error")
 	}
@@ -109,13 +114,14 @@ func TestEvalUndefinedVariable(t *testing.T) {
 
 func TestEvalLetStmt(t *testing.T) {
 	env := NewEnvironment()
+	typeEnv := NewTypeEnvironment()
 
 	program, err := parser.Parse("let x = 3;")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = EvalProgram(program, env)
+	_, err = EvalProgram(program, env, typeEnv)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -125,7 +131,7 @@ func TestEvalLetStmt(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	got, err := EvalProgram(program2, env)
+	got, err := EvalProgram(program2, env, typeEnv)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -147,8 +153,9 @@ func TestEvalProgram(t *testing.T) {
 	}
 
 	env := NewEnvironment()
+	typeEnv := NewTypeEnvironment()
 
-	got, err := EvalProgram(program, env)
+	got, err := EvalProgram(program, env, typeEnv)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -188,8 +195,9 @@ func TestEvalProgramUsesPreviousStatements(t *testing.T) {
 	}
 
 	env := NewEnvironment()
+	typeEnv := NewTypeEnvironment()
 
-	got, err := EvalProgram(program, env)
+	got, err := EvalProgram(program, env, typeEnv)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -205,7 +213,7 @@ func TestEvalEmptyProgram(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	got, err := EvalProgram(program, NewEnvironment())
+	got, err := EvalProgram(program, NewEnvironment(), NewTypeEnvironment())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -230,7 +238,7 @@ func TestEvalTypeErrors(t *testing.T) {
 			t.Fatalf("%q: parse error: %v", input, err)
 		}
 
-		_, err = EvalProgram(program, NewEnvironment())
+		_, err = EvalProgram(program, NewEnvironment(), NewTypeEnvironment())
 		if err == nil {
 			t.Errorf("%q: expected evaluation error", input)
 		}

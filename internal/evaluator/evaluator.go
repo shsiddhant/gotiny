@@ -56,7 +56,7 @@ func evalLetStmt(stmt *ast.LetStmt, env *Environment) (objects.Value, error) {
 	return nil, nil
 }
 
-func EvalStmt(stmt ast.Stmt, env *Environment) (objects.Value, error) {
+func evalStmt(stmt ast.Stmt, env *Environment) (objects.Value, error) {
 	switch stmt := stmt.(type) {
 	case *ast.ExprStmt:
 		return EvalExpr(stmt.Expression, env)
@@ -69,12 +69,15 @@ func EvalStmt(stmt ast.Stmt, env *Environment) (objects.Value, error) {
 	}
 }
 
-func EvalProgram(program *ast.Program, env *Environment) (objects.Value, error) {
+func EvalProgram(program *ast.Program, env *Environment, typeEnv *TypeEnvironment) (objects.Value, error) {
+	if err := CheckProgram(program, typeEnv); err != nil {
+		return nil, err
+	}
 	var result objects.Value
 	var err error
 
 	for _, stmt := range program.Statements {
-		result, err = EvalStmt(stmt, env)
+		result, err = evalStmt(stmt, env)
 		if err != nil {
 			return nil, err
 		}
