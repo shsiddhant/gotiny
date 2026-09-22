@@ -1,0 +1,15 @@
+let detectiveConan = 2412;
+let carissasWierd = 1116;
+let greenButterfly = 1205;
+let theMonster = -1310;
+
+let us = greenButterfly + theMonster;
+let result = false;
+
+if us < 0 && detectiveConan > carissasWierd {
+    result = !(us != -105) || false;
+} else {
+    result = us > -100;
+}
+
+result;

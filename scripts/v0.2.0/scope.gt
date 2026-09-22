@@ -1,0 +1,25 @@
+let x = 2412;
+let y = -1712;
+let z = 1729;
+let a = 1205;
+
+let b = x + y;
+let result = 0;
+
+if !(b > a) || (b != z) {
+    let z = 999;
+    result = b + 529;
+} else {
+    result = -1;
+}
+
+if result == 1229 {
+    if z == 1729 {
+        result = z - a;
+    } else {
+        result = 0;
+    }
+} else {
+    result = -99;
+}
+result;

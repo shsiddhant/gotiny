@@ -1,14 +1,15 @@
 # GoTiny
 
-A tiny statically-typed programming language implemented in Go. It includes an interactive REPL as well the ability to run scripts.
+A tiny statically-typed programming language implemented in Go. It includes an interactive REPL as
+well as the ability to run scripts.
 
 ## Language Features
 
 ### 1. Statically Typed
 
 - **Types:** Supports `Int` and `Bool`.
-- **Static Checking:** Type mismatches, undefined variables, duplicate declaration, and invalid operations
-  are caught by a static checker before evaluation begins.
+- **Static Checking:** Type mismatches, undefined variables, duplicate declarations, and
+  invalid operations are detected before evaluation begins.
 
 ### 2. Operators & Precedence
 
@@ -18,7 +19,8 @@ Expressions follow a strict precedence hierarchy (lowest to highest):
 - **Logical AND:** `&&` (with short-circuit evaluation)
 - **Equality:** `==`, `!=`
 - **Comparison:** `<`, `<=`, `>`, `>=`
-- **Integer Arithmetic:** `+`, `-`, `*`, `/`
+- **Addition/Subtraction:** `+`, `-`
+- **Multiplication/Division:** `*`, `/`
 - **Unary:** `+`, `-` (for integers) and `!` (for booleans)
 - **Primary:** Integer literals, boolean literals, identifiers, and grouped expressions `(...)`
 
@@ -26,10 +28,9 @@ Expressions follow a strict precedence hierarchy (lowest to highest):
 
 - **Declarations:** Variables are declared using the `let` keyword (e.g., `let x = 1712;`)
 - **Assignment:** Existing variables can be reassigned (e.g. `x = 1729;`).
-- **Type-safe assignment::** Variables cannot be reassigned a value of a different type.
-- **Declaration Scope:** Duplicate declarations in the same scope are rejected by the static checker.
-- **Type Environment:** The static checker maintains a separate environment that maps variables to their types.
-- **Runtime Environment:** The evaluator maintains a separate environment that maps variables to their runtime values.
+- **Type-safe assignment:** Variables cannot be reassigned a value of a different type.
+- **Scope:** Blocks introduce a new scope.
+- **Duplicate declarations:** A variable cannot be declared twice in the same scope.
 
 ### 4. Diagnostics & Error Handling
 
@@ -53,10 +54,39 @@ gotiny
 
 ### Executing Scripts
 
-Pass a script file to execute it directly
+Pass a script file to execute it directly:
 
 ```
 gotiny script.gt
+```
+
+## Scripts
+
+You can try out some example scripts provided inside `scripts`. This is one of them:
+
+`scripts/v0.2.0/greenbutterfly.gt`
+
+```
+let detectiveConan = 2412;
+let carissasWierd = 1116;
+let greenButterfly = 1205;
+let theMonster = -1310;
+
+let us = greenButterfly + theMonster;
+let result = false;
+
+if us < 0 && detectiveConan > carissasWierd {
+    result = !(us != -105) || false;
+} else {
+    result = us > -100;
+}
+
+result;
+```
+
+```
+gotiny scripts/v0.2.0/greenbutterfly.gt
+true
 ```
 
 ## Interactive REPL Tour
@@ -96,7 +126,20 @@ is not evaluated when the result is already determined.
 -524
 ```
 
-### 3. Error Diagnostics
+### 3. If Else & Block-Scope
+
+```
+> let x = 1712;
+<nil>
+> if x > 1205 { let y = 1729; x = y; } else { x = 0; }
+<nil>
+> x;
+1729
+> x == y;
+Error: check error at line 1, column 6: undefined variable: y
+```
+
+### 4. Error Diagnostics
 
 **Parse / Syntax Error**
 
@@ -158,6 +201,6 @@ The interpreter is currently split into these components:
 
 ## Roadmap
 
-- [ ] Block-level scoping
-- [ ] If/Else
+- [x] Block-level scoping
+- [x] If/Else
 - [ ] Functions

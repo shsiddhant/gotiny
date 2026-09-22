@@ -1,0 +1,12 @@
+let a = 1729;
+let b = 1205;
+let c = 2412;
+let score = 0;
+
+if a == 1729 || b == 0 && c == 2412 {
+    score = -1729;
+} else {
+    score = 1205;
+}
+
+score;

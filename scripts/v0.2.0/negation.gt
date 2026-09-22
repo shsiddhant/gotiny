@@ -1,0 +1,12 @@
+let val1 = 2412;
+let val2 = -1712;
+let target = 1729;
+let score = 0;
+
+if !(val1 + val2 == 700) {
+    score = 1205;
+} else {
+    score = target;
+}
+
+score;

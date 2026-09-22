@@ -56,6 +56,37 @@ func evalLetStmt(stmt *ast.LetStmt, env *Environment) (objects.Value, error) {
 	return nil, nil
 }
 
+func evalBlockStmt(stmt *ast.BlockStmt, env *Environment) (objects.Value, error) {
+	blockEnv := env.NewChild()
+
+	var result objects.Value
+	var err error
+
+	for _, childStmt := range stmt.Statements {
+		result, err = evalStmt(childStmt, blockEnv)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return result, nil
+}
+
+func evalIfStmt(stmt *ast.IfStmt, env *Environment) (objects.Value, error) {
+	condValue, err := EvalExpr(stmt.Cond, env)
+	if err != nil {
+		return nil, err
+	}
+
+	boolValue := condValue.(objects.Bool)
+
+	if boolValue {
+		return evalBlockStmt(stmt.Body, env)
+	} else if stmt.Else != nil {
+		return evalBlockStmt(stmt.Else, env)
+	}
+	return nil, nil
+}
+
 func evalStmt(stmt ast.Stmt, env *Environment) (objects.Value, error) {
 	switch stmt := stmt.(type) {
 	case *ast.ExprStmt:
@@ -64,6 +95,8 @@ func evalStmt(stmt ast.Stmt, env *Environment) (objects.Value, error) {
 		return evalAssignStmt(stmt, env)
 	case *ast.LetStmt:
 		return evalLetStmt(stmt, env)
+	case *ast.IfStmt:
+		return evalIfStmt(stmt, env)
 	default:
 		return nil, fmt.Errorf("unknown statement type %T", stmt)
 	}
