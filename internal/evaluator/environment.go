@@ -81,7 +81,7 @@ func (e *TypeEnvironment) Get(name string) (objects.Type, error) {
 		if e.outer != nil {
 			return e.outer.Get(name)
 		}
-		return 0, fmt.Errorf("undefined variable: %s", name)
+		return nil, fmt.Errorf("undefined variable: %s", name)
 	}
 	return typ, nil
 }

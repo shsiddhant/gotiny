@@ -1,16 +1,34 @@
 package objects
 
 import (
+	"fmt"
 	"strconv"
+	"strings"
 )
 
-//go:generate go run golang.org/x/tools/cmd/stringer -type=Type
-type Type int
+type Type interface {
+	String() string
+}
+
+//go:generate go run golang.org/x/tools/cmd/stringer -type=BaseType
+type BaseType int
 
 const (
-	IntType Type = iota
+	IntType BaseType = iota
 	BoolType
 )
+
+type FunctionType struct {
+	ParameterTypes []Type
+}
+
+func (t FunctionType) String() string {
+	params := []string{}
+	for _, pt := range t.ParameterTypes {
+		params = append(params, pt.String())
+	}
+	return fmt.Sprintf("fn(%s)", strings.Join(params, ", "))
+}
 
 type Value interface {
 	Type() Type
