@@ -52,16 +52,24 @@ func (e *Environment) Define(name string, value objects.Value) error {
 // Type environment
 type TypeEnvironment struct {
 	types map[string]objects.Type
+	outer *TypeEnvironment
 }
 
 func NewTypeEnvironment() *TypeEnvironment {
 	return &TypeEnvironment{types: make(map[string]objects.Type)}
 }
 
+func (e *TypeEnvironment) NewChild() *TypeEnvironment {
+	return &TypeEnvironment{types: make(map[string]objects.Type), outer: e}
+}
+
 func (e *TypeEnvironment) Get(name string) (objects.Type, error) {
 	typ, ok := e.types[name]
 
 	if !ok {
+		if e.outer != nil {
+			return e.outer.Get(name)
+		}
 		return 0, fmt.Errorf("undefined variable: %s", name)
 	}
 	return typ, nil
@@ -75,6 +83,9 @@ func (e *TypeEnvironment) Assign(name string, typ objects.Type) error {
 	current, ok := e.types[name]
 
 	if !ok {
+		if e.outer != nil {
+			return e.outer.Assign(name, typ)
+		}
 		return fmt.Errorf("undefined variable: %s", name)
 	}
 	if current != typ {
