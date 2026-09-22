@@ -10,9 +10,11 @@ import (
 type Expr interface {
 	expr()
 	String() string
+	LocToken() token.Token // token for location
 }
 
 type LiteralExpr struct {
+	Token token.Token
 	Value objects.Value
 }
 
@@ -20,6 +22,10 @@ func (e LiteralExpr) expr() {}
 
 func (e LiteralExpr) String() string {
 	return e.Value.String()
+}
+
+func (e LiteralExpr) LocToken() token.Token {
+	return e.Token
 }
 
 type VariableExpr struct {
@@ -31,6 +37,13 @@ func (e VariableExpr) expr() {}
 func (e VariableExpr) String() string {
 	return e.Name.Value
 }
+func (e VariableExpr) LocToken() token.Token {
+	return e.Name
+}
+
+func (e VariableExpr) Column() int {
+	return e.Name.Column
+}
 
 type UnaryExpr struct {
 	Operator token.Token
@@ -41,6 +54,10 @@ func (e UnaryExpr) expr() {}
 
 func (e UnaryExpr) String() string {
 	return fmt.Sprintf("(%s%s)", e.Operator.Value, e.Operand)
+}
+
+func (e UnaryExpr) LocToken() token.Token {
+	return e.Operator
 }
 
 type BinaryExpr struct {
@@ -55,6 +72,10 @@ func (e BinaryExpr) String() string {
 	return fmt.Sprintf("(%s %s %s)", e.Left, e.Operator.Value, e.Right)
 }
 
+func (e BinaryExpr) LocToken() token.Token {
+	return e.Operator
+}
+
 type GroupExpr struct {
 	Expression Expr
 }
@@ -63,4 +84,8 @@ func (e GroupExpr) expr() {}
 
 func (e GroupExpr) String() string {
 	return fmt.Sprintf("(group %s)", e.Expression)
+}
+
+func (e GroupExpr) LocToken() token.Token {
+	return e.Expression.LocToken()
 }

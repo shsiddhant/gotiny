@@ -79,7 +79,7 @@ func (p *Parser) primary() (ast.Expr, error) {
 			return nil, err
 		}
 
-		expr := &ast.LiteralExpr{Value: objects.Int(value)}
+		expr := &ast.LiteralExpr{Token: p.current, Value: objects.Int(value)}
 
 		if err := p.advance(); err != nil {
 			return nil, err
@@ -87,14 +87,14 @@ func (p *Parser) primary() (ast.Expr, error) {
 		return expr, nil
 
 	case token.True:
-		expr := &ast.LiteralExpr{Value: objects.Bool(true)}
+		expr := &ast.LiteralExpr{Token: p.current, Value: objects.Bool(true)}
 		if err := p.advance(); err != nil {
 			return nil, err
 		}
 		return expr, nil
 
 	case token.False:
-		expr := &ast.LiteralExpr{Value: objects.Bool(false)}
+		expr := &ast.LiteralExpr{Token: p.current, Value: objects.Bool(false)}
 		if err := p.advance(); err != nil {
 			return nil, err
 		}

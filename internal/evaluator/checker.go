@@ -92,7 +92,7 @@ func typeOfExpr(expr ast.Expr, env *TypeEnvironment) (objects.Type, error) {
 		typ, err := env.Get(expr.Name.Value)
 		if err != nil {
 			return 0, &CheckError{
-				Token:   expr.Name,
+				Token:   expr.LocToken(),
 				Message: err.Error(),
 			}
 		}
@@ -119,7 +119,7 @@ func typeOfUnary(expr *ast.UnaryExpr, env *TypeEnvironment) (objects.Type, error
 	case token.Plus, token.Minus:
 		if operandType != objects.IntType {
 			return 0, &CheckError{
-				Token: expr.Operator,
+				Token: expr.LocToken(),
 				Message: fmt.Sprintf(
 					"unary operator %q cannot be applied to %s", expr.Operator.Value, operandType),
 			}
@@ -128,7 +128,7 @@ func typeOfUnary(expr *ast.UnaryExpr, env *TypeEnvironment) (objects.Type, error
 	case token.Not:
 		if operandType != objects.BoolType {
 			return 0, &CheckError{
-				Token: expr.Operator,
+				Token: expr.LocToken(),
 				Message: fmt.Sprintf(
 					"unary operator %q cannot be applied to %s", expr.Operator.Value, operandType),
 			}
@@ -136,7 +136,7 @@ func typeOfUnary(expr *ast.UnaryExpr, env *TypeEnvironment) (objects.Type, error
 		return objects.BoolType, nil
 	default:
 		return 0, &CheckError{
-			Token:   expr.Operator,
+			Token:   expr.LocToken(),
 			Message: fmt.Sprintf("invalid unary operator %s", expr.Operator),
 		}
 	}
@@ -158,7 +158,7 @@ func typeOfBinary(expr *ast.BinaryExpr, env *TypeEnvironment) (objects.Type, err
 	case token.Plus, token.Minus, token.Star, token.Slash:
 		if leftType != objects.IntType || rightType != objects.IntType {
 			return 0, &CheckError{
-				Token: expr.Operator,
+				Token: expr.LocToken(),
 				Message: fmt.Sprintf(
 					"binary operator %q cannot be applied to %s and %s",
 					expr.Operator.Value,
@@ -171,7 +171,7 @@ func typeOfBinary(expr *ast.BinaryExpr, env *TypeEnvironment) (objects.Type, err
 	case token.Less, token.LessEqual, token.Greater, token.GreaterEqual:
 		if leftType != objects.IntType || rightType != objects.IntType {
 			return 0, &CheckError{
-				Token: expr.Operator,
+				Token: expr.LocToken(),
 				Message: fmt.Sprintf(
 					"binary operator %q cannot be applied to %s and %s",
 					expr.Operator.Value,
@@ -184,7 +184,7 @@ func typeOfBinary(expr *ast.BinaryExpr, env *TypeEnvironment) (objects.Type, err
 	case token.EqualEqual, token.NotEqual:
 		if leftType != rightType {
 			return 0, &CheckError{
-				Token: expr.Operator,
+				Token: expr.LocToken(),
 				Message: fmt.Sprintf(
 					"cannot compare %s and %s",
 					leftType,
@@ -196,7 +196,7 @@ func typeOfBinary(expr *ast.BinaryExpr, env *TypeEnvironment) (objects.Type, err
 	case token.And, token.Or:
 		if leftType != objects.BoolType || rightType != objects.BoolType {
 			return 0, &CheckError{
-				Token: expr.Operator,
+				Token: expr.LocToken(),
 				Message: fmt.Sprintf(
 					"binary operator %q cannot be applied to %s and %s",
 					expr.Operator.Value,
@@ -208,7 +208,7 @@ func typeOfBinary(expr *ast.BinaryExpr, env *TypeEnvironment) (objects.Type, err
 		return objects.BoolType, nil
 	default:
 		return 0, &CheckError{
-			Token:   expr.Operator,
+			Token:   expr.LocToken(),
 			Message: fmt.Sprintf("invalid binary operator %s", expr.Operator),
 		}
 	}
