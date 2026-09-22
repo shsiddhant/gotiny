@@ -42,6 +42,8 @@ func checkStmt(stmt ast.Stmt, env *TypeEnvironment) error {
 		return checkAssignStmt(stmt, env)
 	case *ast.LetStmt:
 		return checkLetStmt(stmt, env)
+	case *ast.IfStmt:
+		return checkIfStmt(stmt, env)
 	default:
 		return fmt.Errorf("unknown statement type %T", stmt)
 	}
@@ -79,6 +81,40 @@ func checkLetStmt(stmt *ast.LetStmt, env *TypeEnvironment) error {
 		return &CheckError{
 			Token:   stmt.Name,
 			Message: err.Error(),
+		}
+	}
+	return nil
+}
+
+func checkBlockStmt(stmt *ast.BlockStmt, env *TypeEnvironment) error {
+	blockEnv := env.NewChild()
+
+	for _, childStmt := range stmt.Statements {
+		if err := checkStmt(childStmt, blockEnv); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func checkIfStmt(stmt *ast.IfStmt, env *TypeEnvironment) error {
+	condType, err := typeOfExpr(stmt.Cond, env)
+	if err != nil {
+		return err
+	}
+	if condType != objects.BoolType {
+		return &CheckError{
+			Token:   stmt.Cond.LocToken(),
+			Message: fmt.Sprintf("condition must be BoolType, got %s", condType),
+		}
+	}
+
+	if err := checkBlockStmt(stmt.Body, env); err != nil {
+		return err
+	}
+	if stmt.Else != nil {
+		if err := checkBlockStmt(stmt.Else, env); err != nil {
+			return err
 		}
 	}
 	return nil
