@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/shsiddhant/gotiny/internal/checker"
 	"github.com/shsiddhant/gotiny/internal/evaluator"
 	"github.com/shsiddhant/gotiny/internal/parser"
 )
@@ -13,7 +14,7 @@ func runREPL() {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	env := evaluator.NewEnvironment()
-	typeEnv := evaluator.NewTypeEnvironment()
+	typeEnv := checker.NewTypeEnvironment()
 
 	for {
 		fmt.Print("> ")

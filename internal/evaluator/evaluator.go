@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/shsiddhant/gotiny/internal/ast"
+	"github.com/shsiddhant/gotiny/internal/checker"
 	"github.com/shsiddhant/gotiny/internal/objects"
 )
 
@@ -102,8 +103,8 @@ func evalStmt(stmt ast.Stmt, env *Environment) (objects.Value, error) {
 	}
 }
 
-func EvalProgram(program *ast.Program, env *Environment, typeEnv *TypeEnvironment) (objects.Value, error) {
-	if err := CheckProgram(program, typeEnv); err != nil {
+func EvalProgram(program *ast.Program, env *Environment, typeEnv *checker.TypeEnvironment) (objects.Value, error) {
+	if err := checker.CheckProgram(program, typeEnv); err != nil {
 		return nil, err
 	}
 	var result objects.Value

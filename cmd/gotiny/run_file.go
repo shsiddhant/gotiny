@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/shsiddhant/gotiny/internal/checker"
 	"github.com/shsiddhant/gotiny/internal/evaluator"
 	"github.com/shsiddhant/gotiny/internal/parser"
 )
@@ -24,7 +25,7 @@ func runFile(filePath string) error {
 	}
 
 	env := evaluator.NewEnvironment()
-	typeEnv := evaluator.NewTypeEnvironment()
+	typeEnv := checker.NewTypeEnvironment()
 
 	result, err := evaluator.EvalProgram(program, env, typeEnv)
 	if err != nil {

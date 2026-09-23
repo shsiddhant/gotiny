@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/shsiddhant/gotiny/internal/checker"
 	"github.com/shsiddhant/gotiny/internal/evaluator"
 	"github.com/shsiddhant/gotiny/internal/objects"
 	"github.com/shsiddhant/gotiny/internal/parser"
@@ -26,7 +27,7 @@ func evalScript(name string, t *testing.T) (objects.Value, error) {
 	}
 
 	env := evaluator.NewEnvironment()
-	typeEnv := evaluator.NewTypeEnvironment()
+	typeEnv := checker.NewTypeEnvironment()
 
 	return evaluator.EvalProgram(program, env, typeEnv)
 }
