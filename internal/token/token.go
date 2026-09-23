@@ -20,6 +20,7 @@ const (
 	Fn
 	Int
 	Bool
+	Return
 
 	// Operators
 

@@ -187,12 +187,13 @@ func (l *Lexer) Next() (token.Token, error) {
 }
 
 var keywords = map[string]token.TokenType{
-	"let":   token.Let,
-	"true":  token.True,
-	"false": token.False,
-	"if":    token.If,
-	"else":  token.Else,
-	"fn":    token.Fn,
-	"Int":   token.Int,
-	"Bool":  token.Bool,
+	"let":    token.Let,
+	"true":   token.True,
+	"false":  token.False,
+	"if":     token.If,
+	"else":   token.Else,
+	"fn":     token.Fn,
+	"Int":    token.Int,
+	"Bool":   token.Bool,
+	"return": token.Return,
 }

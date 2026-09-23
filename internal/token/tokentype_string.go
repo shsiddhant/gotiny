@@ -20,31 +20,32 @@ func _() {
 	_ = x[Fn-9]
 	_ = x[Int-10]
 	_ = x[Bool-11]
-	_ = x[Plus-12]
-	_ = x[Minus-13]
-	_ = x[Star-14]
-	_ = x[Slash-15]
-	_ = x[Equal-16]
-	_ = x[Less-17]
-	_ = x[LessEqual-18]
-	_ = x[Greater-19]
-	_ = x[GreaterEqual-20]
-	_ = x[EqualEqual-21]
-	_ = x[NotEqual-22]
-	_ = x[And-23]
-	_ = x[Or-24]
-	_ = x[Not-25]
-	_ = x[SemiColon-26]
-	_ = x[LeftParen-27]
-	_ = x[RightParen-28]
-	_ = x[LeftCurlyBrace-29]
-	_ = x[RightCurlyBrace-30]
-	_ = x[Comma-31]
+	_ = x[Return-12]
+	_ = x[Plus-13]
+	_ = x[Minus-14]
+	_ = x[Star-15]
+	_ = x[Slash-16]
+	_ = x[Equal-17]
+	_ = x[Less-18]
+	_ = x[LessEqual-19]
+	_ = x[Greater-20]
+	_ = x[GreaterEqual-21]
+	_ = x[EqualEqual-22]
+	_ = x[NotEqual-23]
+	_ = x[And-24]
+	_ = x[Or-25]
+	_ = x[Not-26]
+	_ = x[SemiColon-27]
+	_ = x[LeftParen-28]
+	_ = x[RightParen-29]
+	_ = x[LeftCurlyBrace-30]
+	_ = x[RightCurlyBrace-31]
+	_ = x[Comma-32]
 }
 
-const _TokenType_name = "InvalidTokenEOFNumberIdentifierLetTrueFalseIfElseFnIntBoolPlusMinusStarSlashEqualLessLessEqualGreaterGreaterEqualEqualEqualNotEqualAndOrNotSemiColonLeftParenRightParenLeftCurlyBraceRightCurlyBraceComma"
+const _TokenType_name = "InvalidTokenEOFNumberIdentifierLetTrueFalseIfElseFnIntBoolReturnPlusMinusStarSlashEqualLessLessEqualGreaterGreaterEqualEqualEqualNotEqualAndOrNotSemiColonLeftParenRightParenLeftCurlyBraceRightCurlyBraceComma"
 
-var _TokenType_index = [...]uint8{0, 12, 15, 21, 31, 34, 38, 43, 45, 49, 51, 54, 58, 62, 67, 71, 76, 81, 85, 94, 101, 113, 123, 131, 134, 136, 139, 148, 157, 167, 181, 196, 201}
+var _TokenType_index = [...]uint8{0, 12, 15, 21, 31, 34, 38, 43, 45, 49, 51, 54, 58, 64, 68, 73, 77, 82, 87, 91, 100, 107, 119, 129, 137, 140, 142, 145, 154, 163, 173, 187, 202, 207}
 
 func (i TokenType) String() string {
 	idx := int(i) - 0

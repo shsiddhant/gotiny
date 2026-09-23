@@ -148,6 +148,17 @@ func (stmt FnDeclareStmt) String() string {
 	)
 }
 
+// Return statement
+type ReturnStmt struct {
+	Expr Expr
+}
+
+func (stmt ReturnStmt) stmt() {}
+
+func (stmt ReturnStmt) String() string {
+	return fmt.Sprintf("return %s", stmt.Expr)
+}
+
 func typeString(t objects.Type) string {
 	switch t {
 	case objects.BoolType:
