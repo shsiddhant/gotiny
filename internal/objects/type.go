@@ -14,12 +14,14 @@ type Type interface {
 type BaseType int
 
 const (
-	IntType BaseType = iota
+	VoidType BaseType = iota
+	IntType
 	BoolType
 )
 
 type FunctionType struct {
 	ParameterTypes []Type
+	ReturnType     Type
 }
 
 func (t FunctionType) String() string {
@@ -27,7 +29,7 @@ func (t FunctionType) String() string {
 	for _, pt := range t.ParameterTypes {
 		params = append(params, pt.String())
 	}
-	return fmt.Sprintf("fn(%s)", strings.Join(params, ", "))
+	return fmt.Sprintf("fn(%s) %s", strings.Join(params, ", "), t.ReturnType)
 }
 
 type Value interface {

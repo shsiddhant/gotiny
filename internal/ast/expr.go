@@ -2,6 +2,7 @@ package ast
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/shsiddhant/gotiny/internal/objects"
 	"github.com/shsiddhant/gotiny/internal/token"
@@ -88,4 +89,28 @@ func (e GroupExpr) String() string {
 
 func (e GroupExpr) LocToken() token.Token {
 	return e.Expression.LocToken()
+}
+
+// Call Expression
+type CallExpr struct {
+	Name token.Token
+	Args []Expr
+}
+
+func (e CallExpr) expr() {}
+
+func (e CallExpr) String() string {
+	var args []string
+	for _, arg := range e.Args {
+		args = append(args, arg.String())
+	}
+	return fmt.Sprintf(
+		"%s(%s)",
+		e.Name.Value,
+		strings.Join(args, ", "),
+	)
+}
+
+func (e CallExpr) LocToken() token.Token {
+	return e.Name
 }

@@ -17,6 +17,9 @@ const (
 	False
 	If
 	Else
+	Fn
+	Int
+	Bool
 
 	// Operators
 
@@ -50,6 +53,7 @@ const (
 	RightParen      // )
 	LeftCurlyBrace  // {
 	RightCurlyBrace // }
+	Comma           // ,
 )
 
 type Token struct {

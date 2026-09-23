@@ -2,7 +2,9 @@ package ast
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/shsiddhant/gotiny/internal/objects"
 	"github.com/shsiddhant/gotiny/internal/token"
 )
 
@@ -75,6 +77,9 @@ type BlockStmt struct {
 func (s BlockStmt) stmt() {}
 
 func (s BlockStmt) String() string {
+	if len(s.Statements) == 0 {
+		return "{}"
+	}
 	str := "{\n"
 	for _, stmt := range s.Statements {
 		if stmt != nil {
@@ -108,4 +113,50 @@ func (s IfStmt) String() string {
 		str += " else" + s.Else.String()
 	}
 	return str
+}
+
+type Parameter struct {
+	Name token.Token
+	Type objects.Type
+}
+
+func (param Parameter) String() string {
+	return fmt.Sprintf("%s %s", param.Name.Value, typeString(param.Type))
+}
+
+// Function Declaration Statement
+type FnDeclareStmt struct {
+	Name       token.Token
+	Parameters []Parameter
+	ReturnType objects.Type
+	Body       *BlockStmt
+}
+
+func (stmt FnDeclareStmt) stmt() {}
+
+func (stmt FnDeclareStmt) String() string {
+	var params []string
+	for _, param := range stmt.Parameters {
+		params = append(params, param.String())
+	}
+	return fmt.Sprintf(
+		"fn %s(%s) %s %s",
+		stmt.Name.Value,
+		strings.Join(params, ", "),
+		typeString(stmt.ReturnType),
+		stmt.Body,
+	)
+}
+
+func typeString(t objects.Type) string {
+	switch t {
+	case objects.BoolType:
+		return "Bool"
+	case objects.IntType:
+		return "Int"
+	case objects.VoidType:
+		return "Void"
+	default:
+		return t.String()
+	}
 }

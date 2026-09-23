@@ -521,3 +521,101 @@ func TestParserPrecedence(t *testing.T) {
 	}
 
 }
+
+func TestParserFnDeclare(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{
+			"fn f(x Int, y Int) Int {x+y;}",
+			"fn f(x Int, y Int) Int {\n  (x + y);\n}",
+		},
+		{
+			"fn f(x Bool, y Int) Bool { x || y > 0;}",
+			"fn f(x Bool, y Int) Bool {\n  (x || (y > 0));\n}",
+		},
+		{
+			"fn f(x Int, y Int) {let z = x + y;}",
+			"fn f(x Int, y Int) Void {\n  let z = (x + y);\n}",
+		},
+	}
+
+	for _, tt := range tests {
+		program, err := Parse(tt.input)
+		if err != nil {
+			t.Fatalf("%q: unexpected error: %v", tt.input, err)
+		}
+
+		got := program.Statements[0].String()
+
+		if got != tt.expected {
+			t.Errorf("%q: got:\n %s\n expected %s", tt.input, got, tt.expected)
+		}
+	}
+}
+
+func TestParserCallExpr(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{
+			"f(1+2*3);",
+			"f((1 + (2 * 3)))",
+		},
+		{
+			"f(x > y || z && !flag);",
+			"f(((x > y) || (z && (!flag))))",
+		},
+		{
+			"f(1, 2, 3);",
+			"f(1, 2, 3)",
+		},
+		{
+			"f(-x, !flag, (a + b) * c);",
+			"f((-x), (!flag), ((group (a + b)) * c))",
+		},
+		{
+			"f(x + y, a * b - c / d);",
+			"f((x + y), ((a * b) - (c / d)))",
+		},
+		{
+			"f(x == y, a != b, c <= d || e >= f);",
+			"f((x == y), (a != b), ((c <= d) || (e >= f)))",
+		},
+		{
+			"f(g(1), h(x, y));",
+			"f(g(1), h(x, y))",
+		},
+		{
+			"f(g(1 + 2), h(x > y, !flag));",
+			"f(g((1 + 2)), h((x > y), (!flag)))",
+		},
+		{
+			"1 + g(2) * h(3);",
+			"(1 + (g(2) * h(3)))",
+		},
+		{
+			"f(1 + g(2) * h(3));",
+			"f((1 + (g(2) * h(3))))",
+		},
+		{
+			"f(g(h(1)), k(x + y, z * 2));",
+			"f(g(h(1)), k((x + y), (z * 2)))",
+		},
+	}
+
+	for _, tt := range tests {
+		program, err := Parse(tt.input)
+		if err != nil {
+			t.Fatalf("%q: unexpected error: %v", tt.input, err)
+		}
+
+		got := program.Statements[0].String()
+
+		if got != tt.expected {
+			t.Errorf("%q: got %q, expected %q", tt.input, got, tt.expected)
+		}
+	}
+}

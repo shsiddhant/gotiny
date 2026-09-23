@@ -101,6 +101,13 @@ func (p *Parser) primary() (ast.Expr, error) {
 		return expr, nil
 
 	case token.Identifier:
+		if p.peek.Type == token.LeftParen {
+			expr, err := p.callExpression()
+			if err != nil {
+				return nil, err
+			}
+			return expr, nil
+		}
 		expr := &ast.VariableExpr{Name: p.current}
 
 		if err := p.advance(); err != nil {
@@ -319,6 +326,52 @@ func (p *Parser) booleanOr() (ast.Expr, error) {
 	return expr, nil
 }
 
+func (p *Parser) callArgs() ([]ast.Expr, error) {
+	arg, err := p.expression()
+	if err != nil {
+		return nil, err
+	}
+
+	args := []ast.Expr{arg}
+
+	for p.current.Type == token.Comma {
+		if err := p.advance(); err != nil {
+			return nil, err
+		}
+		arg, err := p.expression()
+		if err != nil {
+			return nil, err
+		}
+		args = append(args, arg)
+	}
+	return args, nil
+}
+
+func (p *Parser) callExpression() (ast.Expr, error) {
+	name := p.current
+	if err := p.advance(); err != nil {
+		return nil, err
+	}
+	if err := p.advance(); err != nil {
+		return nil, err
+	}
+
+	var args []ast.Expr
+	var err error
+
+	if p.current.Type != token.RightParen {
+		args, err = p.callArgs()
+		if err != nil {
+			return nil, err
+		}
+	}
+	if err := p.consume(token.RightParen); err != nil {
+		return nil, err
+	}
+
+	return &ast.CallExpr{Name: name, Args: args}, nil
+}
+
 func (p *Parser) exprStatement() (ast.Stmt, error) {
 	expr, err := p.expression()
 	if err != nil {
@@ -416,6 +469,112 @@ func (p *Parser) ifStatement() (ast.Stmt, error) {
 	}, nil
 }
 
+func (p *Parser) fnParam() (ast.Parameter, error) {
+	name := p.current
+	if err := p.consume(token.Identifier); err != nil {
+		return ast.Parameter{}, &ParseError{
+			Token:   p.current,
+			Message: err.Error(),
+		}
+	}
+	switch p.current.Type {
+	case token.Int:
+		param := ast.Parameter{Name: name, Type: objects.IntType}
+		if err := p.advance(); err != nil {
+			return ast.Parameter{}, &ParseError{
+				Token:   p.current,
+				Message: err.Error(),
+			}
+		}
+		return param, nil
+
+	case token.Bool:
+		param := ast.Parameter{Name: name, Type: objects.BoolType}
+		if err := p.advance(); err != nil {
+			return ast.Parameter{}, &ParseError{
+				Token:   p.current,
+				Message: err.Error(),
+			}
+		}
+		return param, nil
+	}
+	return ast.Parameter{}, &ParseError{
+		Token:   p.current,
+		Message: fmt.Sprintf("expected parameter type, got %s", p.current.Type),
+	}
+}
+
+func (p *Parser) fnParams() ([]ast.Parameter, error) {
+	param, err := p.fnParam()
+	if err != nil {
+		return nil, err
+	}
+	params := []ast.Parameter{param}
+
+	for p.current.Type == token.Comma {
+		if err := p.advance(); err != nil {
+			return nil, err
+		}
+		param, err := p.fnParam()
+		if err != nil {
+			return nil, err
+		}
+		params = append(params, param)
+	}
+	return params, nil
+}
+
+func (p *Parser) fnDeclareStatement() (ast.Stmt, error) {
+	if err := p.consume(token.Fn); err != nil {
+		return nil, err
+	}
+
+	name := p.current
+
+	if err := p.consume(token.Identifier); err != nil {
+		return nil, err
+	}
+	if err := p.consume(token.LeftParen); err != nil {
+		return nil, err
+	}
+
+	var params []ast.Parameter
+	var returnType objects.Type
+	var err error
+
+	if p.current.Type != token.RightParen {
+		params, err = p.fnParams()
+		if err != nil {
+			return nil, err
+		}
+	}
+	if err := p.consume(token.RightParen); err != nil {
+		return nil, err
+	}
+
+	switch p.current.Type {
+	case token.Int:
+		returnType = objects.IntType
+		if err := p.advance(); err != nil {
+			return nil, err
+		}
+	case token.Bool:
+		returnType = objects.BoolType
+		if err := p.advance(); err != nil {
+			return nil, err
+		}
+	default:
+		returnType = objects.VoidType
+	}
+
+	body, err := p.block()
+	if err != nil {
+		return nil, err
+	}
+
+	return &ast.FnDeclareStmt{Name: name, Parameters: params, ReturnType: returnType, Body: body}, nil
+}
+
 func (p *Parser) statement() (ast.Stmt, error) {
 	var stmt ast.Stmt
 	var err error
@@ -427,6 +586,8 @@ func (p *Parser) statement() (ast.Stmt, error) {
 		return p.ifStatement()
 	case p.current.Type == token.Identifier && p.peek.Type == token.Equal:
 		stmt, err = p.assignStatement()
+	case p.current.Type == token.Fn:
+		return p.fnDeclareStatement()
 	default:
 		stmt, err = p.exprStatement()
 	}

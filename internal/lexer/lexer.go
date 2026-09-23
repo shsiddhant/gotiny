@@ -171,6 +171,8 @@ func (l *Lexer) Next() (token.Token, error) {
 		return token.Token{Type: token.LeftCurlyBrace, Value: "{", Line: line, Column: column}, nil
 	case '}':
 		return token.Token{Type: token.RightCurlyBrace, Value: "}", Line: line, Column: column}, nil
+	case ',':
+		return token.Token{Type: token.Comma, Value: ",", Line: line, Column: column}, nil
 	}
 
 	if isDigit(c) {
@@ -190,4 +192,7 @@ var keywords = map[string]token.TokenType{
 	"false": token.False,
 	"if":    token.If,
 	"else":  token.Else,
+	"fn":    token.Fn,
+	"Int":   token.Int,
+	"Bool":  token.Bool,
 }
