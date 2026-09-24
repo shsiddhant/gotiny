@@ -58,6 +58,15 @@ func evalLetStmt(stmt *ast.LetStmt, env *environment.Environment) (objects.Value
 	return nil, nil
 }
 
+func evalReturnStmt(stmt *ast.ReturnStmt, env *environment.Environment) (objects.Value, error) {
+	value, err := EvalExpr(stmt.Expr, env)
+	if err != nil {
+		return nil, err
+	}
+
+	return &objects.ReturnValue{Value: value}, nil
+}
+
 func evalBlockStmt(stmt *ast.BlockStmt, env *environment.Environment) (objects.Value, error) {
 	blockEnv := env.NewChild()
 
@@ -68,6 +77,9 @@ func evalBlockStmt(stmt *ast.BlockStmt, env *environment.Environment) (objects.V
 		result, err = evalStmt(childStmt, blockEnv)
 		if err != nil {
 			return nil, err
+		}
+		if _, ok := result.(*objects.ReturnValue); ok {
+			return result, nil
 		}
 	}
 	return result, nil
@@ -99,6 +111,10 @@ func evalStmt(stmt ast.Stmt, env *environment.Environment) (objects.Value, error
 		return evalLetStmt(stmt, env)
 	case *ast.IfStmt:
 		return evalIfStmt(stmt, env)
+	case *ast.ReturnStmt:
+		return evalReturnStmt(stmt, env)
+	case *ast.FnDeclareStmt:
+		return evalFnDeclareStmt(stmt, env)
 	default:
 		return nil, fmt.Errorf("unknown statement type %T", stmt)
 	}

@@ -146,6 +146,8 @@ func EvalExpr(expr ast.Expr, env *environment.Environment) (objects.Value, error
 		return evalBinary(expr, env)
 	case *ast.GroupExpr:
 		return EvalExpr(expr.Expression, env)
+	case *ast.CallExpr:
+		return evalCallExpr(expr, env)
 	default:
 		return nil, fmt.Errorf("unknown expression type %T", expr)
 

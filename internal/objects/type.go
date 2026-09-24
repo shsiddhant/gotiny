@@ -56,3 +56,15 @@ func (b Bool) Type() Type {
 func (b Bool) String() string {
 	return strconv.FormatBool(bool(b))
 }
+
+type ReturnValue struct {
+	Value Value
+}
+
+func (rt *ReturnValue) Type() Type {
+	return rt.Value.Type()
+}
+
+func (rt *ReturnValue) String() string {
+	return rt.Value.String()
+}

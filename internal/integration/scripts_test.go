@@ -42,6 +42,11 @@ func TestScripts(t *testing.T) {
 		{"v0.2.0/negation.gt", objects.Int(1729)},
 		{"v0.2.0/precedence.gt", objects.Int(-1729)},
 		{"v0.2.0/scope.gt", objects.Int(524)},
+
+		{"v0.3.0/closure.gt", objects.Int(17)},
+		{"v0.3.0/fibonacci.gt", objects.Int(144)},
+		{"v0.3.0/gcd.gt", objects.Int(1)},
+		{"v0.3.0/showcase.gt", objects.Bool(true)},
 	}
 
 	for _, tt := range tests {

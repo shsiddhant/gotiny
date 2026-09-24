@@ -1,0 +1,12 @@
+fn fib(index Int) Int {
+    if index < 0 {
+        return 0;
+    }
+    if index <= 1 {
+        return index;
+    } else {
+        return fib(index - 1) + fib(index - 2);
+    }
+}
+
+fib(12);

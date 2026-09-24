@@ -1,0 +1,15 @@
+fn gcd(a Int, b Int) Int {
+    if b == 0 {
+        return a;
+    }
+    return gcd(b, a - (a / b) * b);
+}
+
+let theMonster = 1013;
+let theGreenButterfly = 1205;
+
+if gcd(1712, 321) == 107 {
+    gcd(theGreenButterfly, theMonster);
+} else {
+    0;
+}

@@ -121,7 +121,16 @@ type Parameter struct {
 }
 
 func (param Parameter) String() string {
-	return fmt.Sprintf("%s %s", param.Name.Value, typeString(param.Type))
+	return fmt.Sprintf("%s %s", param.Name.Value, TypeString(param.Type))
+}
+
+func GetParameterTypes(params []Parameter) []objects.Type {
+	var paramTypes []objects.Type
+
+	for _, param := range params {
+		paramTypes = append(paramTypes, param.Type)
+	}
+	return paramTypes
 }
 
 // Function Declaration Statement
@@ -143,7 +152,7 @@ func (stmt FnDeclareStmt) String() string {
 		"fn %s(%s) %s %s",
 		stmt.Name.Value,
 		strings.Join(params, ", "),
-		typeString(stmt.ReturnType),
+		TypeString(stmt.ReturnType),
 		stmt.Body,
 	)
 }
@@ -159,7 +168,7 @@ func (stmt ReturnStmt) String() string {
 	return fmt.Sprintf("return %s", stmt.Expr)
 }
 
-func typeString(t objects.Type) string {
+func TypeString(t objects.Type) string {
 	switch t {
 	case objects.BoolType:
 		return "Bool"

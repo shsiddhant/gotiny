@@ -1,0 +1,57 @@
+fn abs(x Int) Int {
+    if x < 0 {
+        return -x;
+    }
+    return x;
+}
+
+fn gcd(a Int, b Int) Int {
+    if b == 0 {
+        return abs(a);
+    }
+    return gcd(b, a - (a / b) * b);
+}
+
+fn max(a Int, b Int) Int {
+    if a > b {
+        return a;
+    }
+    return b;
+}
+
+fn min(a Int, b Int) Int {
+    if a < b {
+        return a;
+    }
+    return b;
+}
+
+fn distance(a Int, b Int) Int {
+    return abs(a - b);
+}
+
+fn analyze(a Int, b Int) Int {
+    let common = gcd(a, b);
+    let gap = distance(a, b);
+
+    if common == 1 {
+        return gap;
+    } else {
+        return common;
+    }
+}
+
+let theMonster = 1013;
+let theGreenButterfly = 1205;
+let detectiveConan = 1224;
+let theBestDay = 1217;
+
+let us = min(theMonster, theGreenButterfly);
+let anns = max(detectiveConan, theBestDay);
+
+
+if analyze(theMonster, theGreenButterfly) > analyze(detectiveConan, theBestDay) {
+    anns > us;
+} else {
+    anns - us;
+}

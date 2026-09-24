@@ -1,0 +1,11 @@
+fn outer(x Int) Int {
+    fn inner(y Int) Int {
+        return x + y;
+    }
+    if true {
+        let x = 1712;
+    }
+    return inner(1729);
+}
+
+outer(-1712);
