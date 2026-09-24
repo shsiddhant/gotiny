@@ -27,7 +27,7 @@ func (e *TypeEnvironment) Get(name string) (objects.Type, error) {
 		if e.outer != nil {
 			return e.outer.Get(name)
 		}
-		return nil, fmt.Errorf("undefined variable: %s", name)
+		return nil, fmt.Errorf("undefined name: %s", name)
 	}
 	return typ, nil
 }
@@ -43,7 +43,7 @@ func (e *TypeEnvironment) Assign(name string, typ objects.Type) error {
 		if e.outer != nil {
 			return e.outer.Assign(name, typ)
 		}
-		return fmt.Errorf("undefined variable: %s", name)
+		return fmt.Errorf("undefined name: %s", name)
 	}
 	if current != typ {
 		return fmt.Errorf("cannot assign %s value to %s variable", typ, current)
@@ -54,7 +54,7 @@ func (e *TypeEnvironment) Assign(name string, typ objects.Type) error {
 
 func (e *TypeEnvironment) Define(name string, typ objects.Type) error {
 	if _, exists := e.types[name]; exists {
-		return fmt.Errorf("variable %s already defined", name)
+		return fmt.Errorf("name already defined: %s", name)
 	}
 	e.types[name] = typ
 	return nil

@@ -2,6 +2,7 @@ package checker
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/shsiddhant/gotiny/internal/ast"
 	"github.com/shsiddhant/gotiny/internal/objects"
@@ -21,11 +22,15 @@ func (e *CheckError) Error() string {
 	)
 }
 
+type CheckContext struct {
+	ReturnType objects.Type
+}
+
 func CheckProgram(program *ast.Program, env *TypeEnvironment) error {
 	var err error
 
 	for _, stmt := range program.Statements {
-		err = checkStmt(stmt, env)
+		err = checkStmt(stmt, env, nil)
 		if err != nil {
 			return err
 		}
@@ -33,7 +38,7 @@ func CheckProgram(program *ast.Program, env *TypeEnvironment) error {
 	return nil
 }
 
-func checkStmt(stmt ast.Stmt, env *TypeEnvironment) error {
+func checkStmt(stmt ast.Stmt, env *TypeEnvironment, ctx *CheckContext) error {
 	switch stmt := stmt.(type) {
 	case *ast.ExprStmt:
 		_, err := typeOfExpr(stmt.Expression, env)
@@ -43,7 +48,11 @@ func checkStmt(stmt ast.Stmt, env *TypeEnvironment) error {
 	case *ast.LetStmt:
 		return checkLetStmt(stmt, env)
 	case *ast.IfStmt:
-		return checkIfStmt(stmt, env)
+		return checkIfStmt(stmt, env, ctx)
+	case *ast.ReturnStmt:
+		return checkReturnStmt(stmt, env, ctx)
+	case *ast.FnDeclareStmt:
+		return checkFnDeclareStmt(stmt, env)
 	default:
 		return fmt.Errorf("unknown statement type %T", stmt)
 	}
@@ -86,18 +95,40 @@ func checkLetStmt(stmt *ast.LetStmt, env *TypeEnvironment) error {
 	return nil
 }
 
-func checkBlockStmt(stmt *ast.BlockStmt, env *TypeEnvironment) error {
+func checkReturnStmt(stmt *ast.ReturnStmt, env *TypeEnvironment, ctx *CheckContext) error {
+	if ctx == nil {
+		return &CheckError{
+			Token:   stmt.Expr.LocToken(),
+			Message: "return not allowed outside function",
+		}
+	}
+	returnType, err := typeOfExpr(stmt.Expr, env)
+	if err != nil {
+		return err
+	}
+
+	if returnType != ctx.ReturnType {
+		return &CheckError{
+			Token:   stmt.Expr.LocToken(),
+			Message: fmt.Sprintf("cannot return %s from function expecting %s", returnType, ctx.ReturnType),
+		}
+	}
+
+	return nil
+}
+
+func checkBlockStmt(stmt *ast.BlockStmt, env *TypeEnvironment, ctx *CheckContext) error {
 	blockEnv := env.NewChild()
 
 	for _, childStmt := range stmt.Statements {
-		if err := checkStmt(childStmt, blockEnv); err != nil {
+		if err := checkStmt(childStmt, blockEnv, ctx); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func checkIfStmt(stmt *ast.IfStmt, env *TypeEnvironment) error {
+func checkIfStmt(stmt *ast.IfStmt, env *TypeEnvironment, ctx *CheckContext) error {
 	condType, err := typeOfExpr(stmt.Cond, env)
 	if err != nil {
 		return err
@@ -109,15 +140,72 @@ func checkIfStmt(stmt *ast.IfStmt, env *TypeEnvironment) error {
 		}
 	}
 
-	if err := checkBlockStmt(stmt.Body, env); err != nil {
+	if err := checkBlockStmt(stmt.Body, env, ctx); err != nil {
 		return err
 	}
 	if stmt.Else != nil {
-		if err := checkBlockStmt(stmt.Else, env); err != nil {
+		if err := checkBlockStmt(stmt.Else, env, ctx); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func checkFnDeclareStmt(stmt *ast.FnDeclareStmt, env *TypeEnvironment) error {
+	var paramTypes []objects.Type
+
+	if _, err := env.Get(stmt.Name.Value); err == nil {
+		return &CheckError{
+			Token:   stmt.Name,
+			Message: fmt.Sprintf("name already defined: %s", stmt.Name.Value),
+		}
+	}
+
+	for _, param := range stmt.Parameters {
+		paramTypes = append(paramTypes, param.Type)
+	}
+
+	fnType := &objects.FunctionType{ParameterTypes: paramTypes, ReturnType: stmt.ReturnType}
+
+	fnTypeEnv := env.NewChild()
+
+	fmt.Println(stmt.Name.Value, fnType.ParameterTypes)
+
+	if err := fnTypeEnv.Define(stmt.Name.Value, fnType); err != nil {
+		return err
+	}
+
+	for _, param := range stmt.Parameters {
+		if err := fnTypeEnv.Define(param.Name.Value, param.Type); err != nil {
+			return &CheckError{
+				Token:   param.Name,
+				Message: fmt.Sprintf("duplicate parameter name: %s", param.Name.Value),
+			}
+		}
+	}
+
+	ctx := &CheckContext{stmt.ReturnType}
+
+	if err := checkBlockStmt(stmt.Body, fnTypeEnv, ctx); err != nil {
+		return err
+	}
+
+	if stmt.ReturnType != objects.VoidType && !alwaysReturns(stmt.Body) {
+		return &CheckError{
+			Token:   stmt.Name,
+			Message: fmt.Sprintf("missing return statement at end of function %q", stmt.Name.Value),
+		}
+	}
+
+	if err := env.Define(stmt.Name.Value, fnType); err != nil {
+		return &CheckError{
+			Token:   stmt.Name,
+			Message: err.Error(),
+		}
+	}
+
+	return nil
+
 }
 
 func typeOfExpr(expr ast.Expr, env *TypeEnvironment) (objects.Type, error) {
@@ -139,6 +227,8 @@ func typeOfExpr(expr ast.Expr, env *TypeEnvironment) (objects.Type, error) {
 		return typeOfBinary(expr, env)
 	case *ast.GroupExpr:
 		return typeOfExpr(expr.Expression, env)
+	case *ast.CallExpr:
+		return typeOfCallExpr(expr, env)
 	default:
 		return nil, fmt.Errorf("unknown expression type %T", expr)
 	}
@@ -247,5 +337,58 @@ func typeOfBinary(expr *ast.BinaryExpr, env *TypeEnvironment) (objects.Type, err
 			Token:   expr.LocToken(),
 			Message: fmt.Sprintf("invalid binary operator %s", expr.Operator),
 		}
+	}
+}
+
+func typeOfCallExpr(expr *ast.CallExpr, env *TypeEnvironment) (objects.Type, error) {
+	exprType, err := env.Get(expr.Name.Value)
+	if err != nil {
+		return nil, &CheckError{
+			Token:   expr.LocToken(),
+			Message: err.Error(),
+		}
+	}
+
+	fnType, ok := exprType.(*objects.FunctionType)
+	if !ok {
+		return nil, &CheckError{
+			Token:   expr.LocToken(),
+			Message: fmt.Sprintf("expected function type, got %s", exprType),
+		}
+	}
+
+	if len(expr.Args) != len(fnType.ParameterTypes) {
+		return nil, &CheckError{
+			Token:   expr.LocToken(),
+			Message: fmt.Sprintf("expected %d args, got %d", len(fnType.ParameterTypes), len(expr.Args)),
+		}
+	}
+
+	for i, arg := range expr.Args {
+		argType, err := typeOfExpr(arg, env)
+		if err != nil {
+			return nil, err
+		}
+		if argType != fnType.ParameterTypes[i] {
+			return nil, &CheckError{
+				Token:   arg.LocToken(),
+				Message: fmt.Sprintf("expected %s arg, got %s", fnType.ParameterTypes[i], argType),
+			}
+		}
+	}
+
+	return fnType.ReturnType, nil
+}
+
+func alwaysReturns(stmt ast.Stmt) bool {
+	switch s := stmt.(type) {
+	case *ast.ReturnStmt:
+		return true
+	case *ast.BlockStmt:
+		return slices.ContainsFunc(s.Statements, alwaysReturns)
+	case *ast.IfStmt:
+		return s.Else != nil && alwaysReturns(s.Body) && alwaysReturns(s.Else)
+	default:
+		return false
 	}
 }
