@@ -38,7 +38,9 @@ func runREPL() {
 			continue
 		}
 
-		fmt.Println(result)
+		if result != nil {
+			fmt.Println(result)
+		}
 	}
 
 	if err := scanner.Err(); err != nil {

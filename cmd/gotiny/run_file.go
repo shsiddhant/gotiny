@@ -32,6 +32,8 @@ func runFile(filePath string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(result)
+	if result != nil {
+		fmt.Println(result)
+	}
 	return nil
 }
