@@ -169,8 +169,6 @@ func checkFnDeclareStmt(stmt *ast.FnDeclareStmt, env *TypeEnvironment) error {
 
 	fnTypeEnv := env.NewChild()
 
-	fmt.Println(stmt.Name.Value, fnType.ParameterTypes)
-
 	if err := fnTypeEnv.Define(stmt.Name.Value, fnType); err != nil {
 		return err
 	}

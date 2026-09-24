@@ -4,13 +4,14 @@ import (
 	"fmt"
 
 	"github.com/shsiddhant/gotiny/internal/ast"
+	"github.com/shsiddhant/gotiny/internal/environment"
 	"github.com/shsiddhant/gotiny/internal/objects"
 	"github.com/shsiddhant/gotiny/internal/token"
 )
 
 // Note: eval* functions now assume type checks have already been done.
 
-func evalUnary(expr *ast.UnaryExpr, env *Environment) (objects.Value, error) {
+func evalUnary(expr *ast.UnaryExpr, env *environment.Environment) (objects.Value, error) {
 	operandEval, err := EvalExpr(expr.Operand, env)
 
 	if err != nil {
@@ -85,7 +86,7 @@ func evalEquality(left, right objects.Value, operator token.Token) (objects.Valu
 	}
 }
 
-func evalBinary(expr *ast.BinaryExpr, env *Environment) (objects.Value, error) {
+func evalBinary(expr *ast.BinaryExpr, env *environment.Environment) (objects.Value, error) {
 	left, err := EvalExpr(expr.Left, env)
 
 	if err != nil {
@@ -133,7 +134,7 @@ func evalBinary(expr *ast.BinaryExpr, env *Environment) (objects.Value, error) {
 	}
 }
 
-func EvalExpr(expr ast.Expr, env *Environment) (objects.Value, error) {
+func EvalExpr(expr ast.Expr, env *environment.Environment) (objects.Value, error) {
 	switch expr := expr.(type) {
 	case *ast.LiteralExpr:
 		return expr.Value, nil

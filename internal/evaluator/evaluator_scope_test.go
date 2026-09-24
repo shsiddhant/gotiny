@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/shsiddhant/gotiny/internal/checker"
+	"github.com/shsiddhant/gotiny/internal/environment"
 	"github.com/shsiddhant/gotiny/internal/objects"
 	"github.com/shsiddhant/gotiny/internal/parser"
 )
@@ -23,7 +24,7 @@ func TestEvalIfElseMutation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	env := NewEnvironment()
+	env := environment.NewEnvironment()
 	typEnv := checker.NewTypeEnvironment()
 
 	_, err = EvalProgram(program, env, typEnv)
@@ -53,7 +54,7 @@ func TestEvalVariableShadowing(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	env := NewEnvironment()
+	env := environment.NewEnvironment()
 	typEnv := checker.NewTypeEnvironment()
 
 	_, err = EvalProgram(program, env, typEnv)
@@ -86,7 +87,7 @@ func TestEvalNestedMutation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	env := NewEnvironment()
+	env := environment.NewEnvironment()
 	typeEnv := checker.NewTypeEnvironment()
 
 	_, err = EvalProgram(program, env, typeEnv)

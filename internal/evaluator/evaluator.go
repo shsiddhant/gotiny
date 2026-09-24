@@ -5,6 +5,7 @@ import (
 
 	"github.com/shsiddhant/gotiny/internal/ast"
 	"github.com/shsiddhant/gotiny/internal/checker"
+	"github.com/shsiddhant/gotiny/internal/environment"
 	"github.com/shsiddhant/gotiny/internal/objects"
 )
 
@@ -22,7 +23,7 @@ func (e *EvalError) Error() string {
 	)
 }
 
-func evalAssignStmt(stmt *ast.AssignStmt, env *Environment) (objects.Value, error) {
+func evalAssignStmt(stmt *ast.AssignStmt, env *environment.Environment) (objects.Value, error) {
 	value, err := EvalExpr(stmt.Value, env)
 
 	if err != nil {
@@ -39,7 +40,7 @@ func evalAssignStmt(stmt *ast.AssignStmt, env *Environment) (objects.Value, erro
 	return nil, nil
 }
 
-func evalLetStmt(stmt *ast.LetStmt, env *Environment) (objects.Value, error) {
+func evalLetStmt(stmt *ast.LetStmt, env *environment.Environment) (objects.Value, error) {
 	value, err := EvalExpr(stmt.Value, env)
 
 	if err != nil {
@@ -57,7 +58,7 @@ func evalLetStmt(stmt *ast.LetStmt, env *Environment) (objects.Value, error) {
 	return nil, nil
 }
 
-func evalBlockStmt(stmt *ast.BlockStmt, env *Environment) (objects.Value, error) {
+func evalBlockStmt(stmt *ast.BlockStmt, env *environment.Environment) (objects.Value, error) {
 	blockEnv := env.NewChild()
 
 	var result objects.Value
@@ -72,7 +73,7 @@ func evalBlockStmt(stmt *ast.BlockStmt, env *Environment) (objects.Value, error)
 	return result, nil
 }
 
-func evalIfStmt(stmt *ast.IfStmt, env *Environment) (objects.Value, error) {
+func evalIfStmt(stmt *ast.IfStmt, env *environment.Environment) (objects.Value, error) {
 	condValue, err := EvalExpr(stmt.Cond, env)
 	if err != nil {
 		return nil, err
@@ -88,7 +89,7 @@ func evalIfStmt(stmt *ast.IfStmt, env *Environment) (objects.Value, error) {
 	return nil, nil
 }
 
-func evalStmt(stmt ast.Stmt, env *Environment) (objects.Value, error) {
+func evalStmt(stmt ast.Stmt, env *environment.Environment) (objects.Value, error) {
 	switch stmt := stmt.(type) {
 	case *ast.ExprStmt:
 		return EvalExpr(stmt.Expression, env)
@@ -103,7 +104,7 @@ func evalStmt(stmt ast.Stmt, env *Environment) (objects.Value, error) {
 	}
 }
 
-func EvalProgram(program *ast.Program, env *Environment, typeEnv *checker.TypeEnvironment) (objects.Value, error) {
+func EvalProgram(program *ast.Program, env *environment.Environment, typeEnv *checker.TypeEnvironment) (objects.Value, error) {
 	if err := checker.CheckProgram(program, typeEnv); err != nil {
 		return nil, err
 	}

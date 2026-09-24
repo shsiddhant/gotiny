@@ -1,4 +1,4 @@
-package evaluator
+package environment
 
 import (
 	"testing"
@@ -123,4 +123,3 @@ func TestEnvironmentAssignWrongType(t *testing.T) {
 		t.Error("expected wrong type assignment error")
 	}
 }
-
