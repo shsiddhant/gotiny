@@ -118,10 +118,8 @@ func checkReturnStmt(stmt *ast.ReturnStmt, env *TypeEnvironment, ctx *CheckConte
 }
 
 func checkBlockStmt(stmt *ast.BlockStmt, env *TypeEnvironment, ctx *CheckContext) error {
-	blockEnv := env.NewChild()
-
 	for _, childStmt := range stmt.Statements {
-		if err := checkStmt(childStmt, blockEnv, ctx); err != nil {
+		if err := checkStmt(childStmt, env, ctx); err != nil {
 			return err
 		}
 	}
@@ -140,11 +138,13 @@ func checkIfStmt(stmt *ast.IfStmt, env *TypeEnvironment, ctx *CheckContext) erro
 		}
 	}
 
-	if err := checkBlockStmt(stmt.Body, env, ctx); err != nil {
+	bodyEnv := env.NewChild()
+	if err := checkBlockStmt(stmt.Body, bodyEnv, ctx); err != nil {
 		return err
 	}
 	if stmt.Else != nil {
-		if err := checkBlockStmt(stmt.Else, env, ctx); err != nil {
+		elseEnv := env.NewChild()
+		if err := checkBlockStmt(stmt.Else, elseEnv, ctx); err != nil {
 			return err
 		}
 	}

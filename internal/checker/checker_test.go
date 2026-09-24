@@ -82,6 +82,40 @@ func TestTypeChecker(t *testing.T) {
 		errorSubstr string
 	}{
 		{
+			name: "Shadowing should be allowed",
+			source: `
+				let x = 1712;
+				if x < 1729 {
+					let x = -x;
+				}
+			`,
+			expectError: false,
+		},
+		{
+			name: "If statement else block shouldn't see body env",
+			source: `
+				if true {
+    				let x = 1712;
+				} else {
+				    x;
+				}
+			`,
+			expectError: true,
+			errorSubstr: "undefined name: x",
+		},
+		{
+			name: "If statement body shouldn't see else block env",
+			source: `
+				if true {
+    				y = 1205;
+				} else {
+				    let y = 1013;
+				}
+			`,
+			expectError: true,
+			errorSubstr: "undefined name: y",
+		},
+		{
 			name: "Valid sequential return",
 			source: `
 				fn square(x Int) Int {
@@ -245,6 +279,30 @@ func TestTypeChecker(t *testing.T) {
 						return n * factorial(n-1);
 					}
 
+				}
+			`,
+			expectError: false,
+		},
+		{
+			name: "Redeclaration of parameter inside immediate function scope not allowed",
+			source: `
+				fn f(x Int) Int {
+    				let x = 100;
+    				return x;
+				}
+			`,
+			expectError: true,
+			errorSubstr: "name already defined: x",
+		},
+		{
+			name: "Shadowing works as expected inside nested block in functions.",
+			source: `
+				fn f(x Int) Bool {
+					if x > 0 {
+						let x = true;
+						return x;
+					}
+					return false;
 				}
 			`,
 			expectError: false,
