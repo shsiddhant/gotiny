@@ -1,8 +1,10 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
+	"runtime/debug"
 
 	"github.com/shsiddhant/gotiny/internal/checker"
 	"github.com/shsiddhant/gotiny/internal/evaluator"
@@ -10,6 +12,19 @@ import (
 )
 
 func main() {
+
+	var versionFlag bool
+
+	flag.BoolVar(&versionFlag, "version", false, "print version information")
+	flag.BoolVar(&versionFlag, "v", false, "print version information (shorthand)")
+
+	flag.Parse()
+
+	if versionFlag {
+		fmt.Printf("gotiny %s\n", getVersion())
+		os.Exit(0)
+	}
+
 	switch len(os.Args) {
 	case 1:
 		runREPL()
@@ -35,4 +50,12 @@ func formatError(err error, filePath string) string {
 		return fmt.Sprintf("%s:%d:%d: %s", filePath, e.Line, e.Column, e.Message)
 	}
 	return err.Error()
+}
+
+func getVersion() string {
+	info, ok := debug.ReadBuildInfo()
+	if !ok || info.Main.Version == "" {
+		return "devel"
+	}
+	return info.Main.Version
 }
