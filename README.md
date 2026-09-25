@@ -11,7 +11,8 @@ expressions and statements.
 - **Types:** Supports `Int` and `Bool`, and function types
 - **Static Checking:** Type mismatches, undefined variables, duplicate declarations,
   invalid operations, and invalid function calls are detected before evaluation begins.
-- **Function Types:** Function parameter and return types are checked statically.
+- **Function Types:** Function types can be used as parameter and return types, and are checked
+  structurally during static checking.
 
 ### 2. Operators & Precedence
 
@@ -46,11 +47,20 @@ fn add(x Int, y Int) Int {
 }
 ```
 
+Function types use the fn syntax and can appear wherever a type is expected:
+
+```gt
+fn apply(f fn(Int) Int, x Int) Int {
+    return f(x);
+}
+```
+
 Functions support:
 
 - **Parameters:** Functions can accept typed parameters.
 - **Return values:** Functions return values using the return statement.
 - **Function calls:** A function call is an expression whose type is the function's declared return type.
+- **Function values:** Functions can be passed as arguments and returned from other functions.
 - **Void functions:** Functions without a return value have a Void return type.
 - **Closures:** Functions capture their lexical environment and can access variables from their enclosing scope.
 - **Recursion:** Functions can call themselves recursively.
@@ -73,78 +83,69 @@ gotiny script.gt
 ```
 
 The repository includes several example programs in the scripts directory.
-The main showcase for v0.3.0 is:
+The main showcase for v0.4.0 is:
 
-`scripts/v0.3.0/showcase.gt`
+`scripts/v0.4.0/fibonacci_closure.gt`
 
 ```gt
-fn abs(x Int) Int {
-    if x < 0 {
-        return -x;
+fn fibonacci() fn() Int {
+    let current = 0;
+    let next = 1;
+
+    fn genNext() Int {
+        let newNext = current + next;
+        current = next;
+        next = newNext;
+        return current;
     }
-    return x;
+    return genNext;
 }
 
-fn gcd(a Int, b Int) Int {
-    if b == 0 {
-        return abs(a);
-    }
-    return gcd(b, a - (a / b) * b);
-}
-
-fn max(a Int, b Int) Int {
-    if a > b {
-        return a;
-    }
-    return b;
-}
-
-fn min(a Int, b Int) Int {
-    if a < b {
-        return a;
-    }
-    return b;
-}
-
-fn distance(a Int, b Int) Int {
-    return abs(a - b);
-}
-
-fn analyze(a Int, b Int) Int {
-    let common = gcd(a, b);
-    let gap = distance(a, b);
-
-    if common == 1 {
-        return gap;
-    } else {
-        return common;
-    }
-}
-
-let theMonster = 1013;
-let theGreenButterfly = 1205;
-let detectiveConan = 1224;
-let theBestDay = 1217;
-
-let us = min(theMonster, theGreenButterfly);
-let anns = max(detectiveConan, theBestDay);
-
-
-if analyze(theMonster, theGreenButterfly) > analyze(detectiveConan, theBestDay) {
-    anns > us;
-} else {
-    anns - us;
-}
+let f = fibonacci();
+f(); f(); f(); f();
+f(); f(); f(); f();
 ```
 
-Run it with:
+This produces:
 
 ```
-gotiny scripts/v0.3.0/showcase.gt
-true
+21
 ```
 
-The repository contains additional example scripts that can be you can try out.
+The returned function is a closure that retains access to the mutable current and next
+variables from its enclosing function.
+
+Another example demonstrates passing functions as arguments and returning closures:
+
+`scripts/v0.4.0/function_scale.gt`
+
+```gt
+fn scaleFunction(
+    s Int,
+    g fn(Int) Int
+) fn(Int) Int {
+    fn scaled (y Int) Int {
+        return s * g(y);
+    }
+    return scaled;
+}
+
+let s = 3;
+fn base(n Int) Int {
+    return n;
+}
+
+let scaled = scaleFunction(s, base);
+scaled(1712);
+```
+
+This produces:
+
+```
+5136
+```
+
+The repository contains additional example scripts that you can try out.
 
 ### Interactive REPL
 
@@ -157,24 +158,26 @@ gotiny
 The REPL is useful for experimenting with expressions and individual statements:
 
 ```
+
 > 3 * (1729 - 1712);
-51
+> 51
 > 123 + 4 * (3 - 2);
-127
+> 127
 > 20 / 5 / 3;
-1
+> 1
 > -(2 + 3) * -5;
-25
+> 25
 > 1712 +-1729;
--17
+> -17
 > 1729 > 1712 || -1729 > -1712 && !true;
-true
+> true
 > 1 / 0;
-Error: evaluation error at line 1, column 3: division by zero
+> Error: evaluation error at line 1, column 3: division by zero
 > true || 1 / 0 > 0;
-true
+> true
 > false && 1 / 0 == 0;
-false
+> false
+
 ```
 
 The last two examples demonstrate short-circuit evaluation: the right-hand side
@@ -190,31 +193,37 @@ Custom error types track exact line and column numbers for syntax, type, and run
 **Parse / Syntax Error**
 
 ```
+
 > 3 * (1 + ;
-Error: parse error at line 1, column 10: expected expression, got SemiColon
+> Error: parse error at line 1, column 10: expected expression, got SemiColon
+
 ```
 
 **Static Type Check**
 
 ```
+
 > 1 + true;
-Error: check error at line 1, column 3: binary operator "+" cannot be applied to IntType and BoolType
+> Error: check error at line 1, column 3: binary operator "+" cannot be applied to IntType and BoolType
 > true > false;
-Error: check error at line 1, column 6: binary operator ">" cannot be applied to BoolType and BoolType
+> Error: check error at line 1, column 6: binary operator ">" cannot be applied to BoolType and BoolType
 > fn isNonNegative(x Int) Bool { if x > 0 { return true;}}
-Error: check error at line 1, column 4: missing return statement at end of function "isNonNegative"
+> Error: check error at line 1, column 4: missing return statement at end of function "isNonNegative"
+
 ```
 
 **Scope Declaration & Assignment Errors:**
 
 ```
+
 > x + 5;
-Error: check error at line 1, column 1: undefined name: x
+> Error: check error at line 1, column 1: undefined name: x
 > let boolean = true;
 > boolean = 1712;
-Error: check error at line 1, column 1: cannot assign IntType value to BoolType variable
+> Error: check error at line 1, column 1: cannot assign IntType value to BoolType variable
 > let boolean = false;
-Error: check error at line 1, column 5: name already defined: boolean
+> Error: check error at line 1, column 5: name already defined: boolean
+
 ```
 
 ## Architecture
@@ -255,9 +264,10 @@ The interpreter is currently split into these components:
   - [x] Function parameters and return values
   - [x] Closures
   - [x] Recursion
-  - [ ] Functions as return values
+  - [x] Functions as parameters and return values
+- [ ] Print statement
+- [ ] While loops
 - [ ] Strings
-- [ ] Built-in function for printing values
 
 ## License
 

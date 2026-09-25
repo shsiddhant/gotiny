@@ -509,6 +509,14 @@ func (p *Parser) fnParam() (ast.Parameter, error) {
 			}
 		}
 		return param, nil
+
+	case token.Fn:
+		typ, err := p.fnType()
+		if err != nil {
+			return ast.Parameter{}, err
+		}
+		param := ast.Parameter{Name: name, Type: typ}
+		return param, nil
 	}
 	return ast.Parameter{}, &ParseError{
 		Token:   p.current,
@@ -536,6 +544,170 @@ func (p *Parser) fnParams() ([]ast.Parameter, error) {
 	return params, nil
 }
 
+func (p *Parser) fnTypeParam() (objects.Type, error) {
+	switch p.current.Type {
+	case token.Int:
+		if err := p.advance(); err != nil {
+			return nil, &ParseError{
+				Token:   p.current,
+				Message: err.Error(),
+			}
+		}
+		return objects.IntType, nil
+
+	case token.Bool:
+		if err := p.advance(); err != nil {
+			return nil, &ParseError{
+				Token:   p.current,
+				Message: err.Error(),
+			}
+		}
+		return objects.BoolType, nil
+
+	case token.Fn:
+		return p.fnType()
+	}
+	return nil, &ParseError{
+		Token:   p.current,
+		Message: fmt.Sprintf("expected parameter type, got %s", p.current.Type),
+	}
+}
+
+func (p *Parser) fnReturnType() (objects.Type, error) {
+	switch p.current.Type {
+	case token.Int:
+		if err := p.advance(); err != nil {
+			return nil, err
+		}
+		return objects.IntType, nil
+
+	case token.Bool:
+		if err := p.advance(); err != nil {
+			return nil, err
+		}
+		return objects.BoolType, nil
+
+	case token.Fn:
+		return p.fnType()
+
+	default:
+		return objects.VoidType, nil
+	}
+}
+
+func (p *Parser) fnType() (objects.Type, error) {
+	if err := p.consume(token.Fn); err != nil {
+		return nil, err
+	}
+	if err := p.consume(token.LeftParen); err != nil {
+		return nil, err
+	}
+
+	var paramTypes []objects.Type
+
+	if p.current.Type != token.RightParen {
+		var err error
+		paramTypes, err = p.fnTypeParams()
+		if err != nil {
+			return nil, err
+		}
+	}
+	if err := p.consume(token.RightParen); err != nil {
+		return nil, err
+	}
+	returnType, err := p.fnReturnType()
+	if err != nil {
+		return nil, err
+	}
+
+	return &objects.FunctionType{
+		ParameterTypes: paramTypes,
+		ReturnType:     returnType,
+	}, nil
+}
+
+func (p *Parser) fnTypeParams() ([]objects.Type, error) {
+	paramType, err := p.fnTypeParam()
+	if err != nil {
+		return nil, err
+	}
+	paramTypes := []objects.Type{paramType}
+
+	for p.current.Type == token.Comma {
+		if err := p.advance(); err != nil {
+			return nil, err
+		}
+		paramType, err := p.fnTypeParam()
+		if err != nil {
+			return nil, err
+		}
+		paramTypes = append(paramTypes, paramType)
+	}
+	return paramTypes, nil
+}
+
+func (p *Parser) fnDeclReturnType() (objects.Type, error) {
+	switch p.current.Type {
+	case token.Int:
+		if err := p.advance(); err != nil {
+			return nil, err
+		}
+		return objects.IntType, nil
+
+	case token.Bool:
+		if err := p.advance(); err != nil {
+			return nil, err
+		}
+		return objects.BoolType, nil
+
+	case token.Fn:
+		return p.fnTypeDecl()
+
+	case token.LeftCurlyBrace:
+		return objects.VoidType, nil
+
+	default:
+		return nil, &ParseError{
+			Token: p.current,
+			Message: fmt.Sprintf(
+				"expected return type or {, got %ss",
+				p.current.Type,
+			),
+		}
+	}
+}
+
+func (p *Parser) fnTypeDecl() (objects.Type, error) {
+	if err := p.consume(token.Fn); err != nil {
+		return nil, err
+	}
+	if err := p.consume(token.LeftParen); err != nil {
+		return nil, err
+	}
+
+	var paramTypes []objects.Type
+
+	if p.current.Type != token.RightParen {
+		var err error
+		paramTypes, err = p.fnTypeParams()
+		if err != nil {
+			return nil, err
+		}
+	}
+	if err := p.consume(token.RightParen); err != nil {
+		return nil, err
+	}
+	returnType, err := p.fnDeclReturnType()
+	if err != nil {
+		return nil, err
+	}
+
+	return &objects.FunctionType{
+		ParameterTypes: paramTypes,
+		ReturnType:     returnType,
+	}, nil
+}
+
 func (p *Parser) fnDeclareStatement() (ast.Stmt, error) {
 	if err := p.consume(token.Fn); err != nil {
 		return nil, err
@@ -551,10 +723,9 @@ func (p *Parser) fnDeclareStatement() (ast.Stmt, error) {
 	}
 
 	var params []ast.Parameter
-	var returnType objects.Type
-	var err error
 
 	if p.current.Type != token.RightParen {
+		var err error
 		params, err = p.fnParams()
 		if err != nil {
 			return nil, err
@@ -564,19 +735,9 @@ func (p *Parser) fnDeclareStatement() (ast.Stmt, error) {
 		return nil, err
 	}
 
-	switch p.current.Type {
-	case token.Int:
-		returnType = objects.IntType
-		if err := p.advance(); err != nil {
-			return nil, err
-		}
-	case token.Bool:
-		returnType = objects.BoolType
-		if err := p.advance(); err != nil {
-			return nil, err
-		}
-	default:
-		returnType = objects.VoidType
+	returnType, err := p.fnDeclReturnType()
+	if err != nil {
+		return nil, err
 	}
 
 	body, err := p.block()

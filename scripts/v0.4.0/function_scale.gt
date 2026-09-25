@@ -1,0 +1,17 @@
+fn scaleFunction(
+    s Int,
+    g fn(Int) Int
+) fn(Int) Int {
+    fn scaled (y Int) Int {
+        return s * g(y);
+    }
+    return scaled;
+}
+
+let s = 3;
+fn base(n Int) Int {
+    return n;
+}
+
+let scaled = scaleFunction(s, base);
+scaled(1712);

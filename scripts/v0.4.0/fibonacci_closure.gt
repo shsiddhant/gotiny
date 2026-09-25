@@ -1,0 +1,16 @@
+fn fibonacci() fn() Int {
+    let current = 0;
+    let next = 1;
+
+    fn genNext() Int {
+        let newNext = current + next;
+        current = next;
+        next = newNext;
+        return current;
+    }
+    return genNext;
+}
+
+let f = fibonacci();
+f(); f(); f(); f();
+f(); f(); f(); f();

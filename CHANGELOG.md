@@ -8,7 +8,32 @@ All notable changes to GoTiny are documented in this file.
 
 -
 
-## [v0.3.1]
+## [0.4.0] - 2026-09-25
+
+### Added
+
+- Function types can now be expressed in source syntax.
+  - Functions can return functions.
+  - Functions can accept functions as arguments.
+  - Function types support nested function types.
+
+  For example:
+
+  ```gotiny
+  fn fibonacci() fn() Int {
+      ...
+  }
+
+  fn apply(f fn(Int) Int, x Int) Int {
+      return f(x);
+  }
+  ```
+
+### Changed
+
+- Compare function types structurally during static type checking.
+
+## [0.3.1] - 2026-09-25
 
 ### Added
 
@@ -20,7 +45,7 @@ All notable changes to GoTiny are documented in this file.
 - Improve file error diagnostics with standard formatted output.
 - Add golangci-lint configuration and standardize code formatting.
 
-## [0.3.0]
+## [0.3.0] - 2026-09-24
 
 ### Added
 
@@ -40,7 +65,7 @@ All notable changes to GoTiny are documented in this file.
 - Avoid printing nil evaluation results.
 - Polish and update the README.
 
-## [0.2.0]
+## [0.2.0] - 2026-09-22
 
 ### Added
 
@@ -52,7 +77,7 @@ All notable changes to GoTiny are documented in this file.
 
 - Add location token helper to expressions to support diagnostics.
 
-## [0.1.0]
+## [0.1.0] - 2026-09-21
 
 ### Added
 

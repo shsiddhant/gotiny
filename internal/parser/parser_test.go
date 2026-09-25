@@ -631,3 +631,131 @@ func TestParserCallExpr(t *testing.T) {
 		}
 	}
 }
+
+func TestParseFunctionType(t *testing.T) {
+	tests := []struct {
+		name   string
+		source string
+	}{
+		{
+			name: "one parameter",
+			source: `
+				fn apply(f fn(Int) Int) Int {
+					return f(1);
+				}
+			`,
+		},
+		{
+			name: "multiple parameters",
+			source: `
+				fn apply(f fn(Int, Int) Int) Int {
+					return f(1, 2);
+				}
+			`,
+		},
+		{
+			name: "no parameters",
+			source: `
+				fn makeValue(f fn() Int) Int {
+					return f();
+				}
+			`,
+		},
+		{
+			name: "function return type",
+			source: `
+				fn makeFunction() fn(Int) Int {
+					return nil;
+				}
+			`,
+		},
+		{
+			name: "function parameter and return type",
+			source: `
+				fn scaleFunction(s Int, g fn(Int) Int) fn(Int) Int {
+					return nil;
+				}
+			`,
+		},
+		{
+			name: "nested function type",
+			source: `
+				fn compose(f fn(Int) Int) fn(Int) Int {
+					return nil;
+				}
+			`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if _, err := Parse(tt.source); err != nil {
+				t.Fatalf("Parse() error = %v", err)
+			}
+		})
+	}
+}
+
+func TestParseInvalidFunctionType(t *testing.T) {
+	tests := []struct {
+		name   string
+		source string
+	}{
+		{
+			name: "missing parameter list",
+			source: `
+				fn theBestDay(f fn Int) Int {
+					return 1712;
+				}
+			`,
+		},
+		{
+			name: "missing closing parenthesis",
+			source: `
+				fn theBestDay(f fn(Int Int) Int {
+					return 1712;
+				}
+			`,
+		},
+		{
+			name: "missing parameter type",
+			source: `
+				fn theBestDay(f fn(Int, ) Int) Int {
+					return 1712;
+				}
+			`,
+		},
+		{
+			name: "missing comma between parameters",
+			source: `
+				fn theBestDay(f fn(Int Bool) Int) Int {
+					return 1712;
+				}
+			`,
+		},
+		{
+			name: "missing closing function type parenthesis",
+			source: `
+				fn theBestDay(f fn(Int Int {
+					return 1712;
+				}
+			`,
+		},
+		{
+			name: "invalid function type parameter",
+			source: `
+				fn theBestDay(f fn(Int, fn) Int) Int {
+					return 1712;
+				}
+			`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if _, err := Parse(tt.source); err == nil {
+				t.Fatal("Parse() expected an error")
+			}
+		})
+	}
+}
