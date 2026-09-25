@@ -258,3 +258,7 @@ The interpreter is currently split into these components:
   - [ ] Functions as return values
 - [ ] Strings
 - [ ] Built-in function for printing values
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
