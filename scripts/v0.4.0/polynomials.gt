@@ -1,0 +1,56 @@
+# identityFunction on integers
+fn identityFunction(x Int) Int {
+    return x;
+}
+
+# add returns the sum of f and g as integer to integer function.
+fn add(
+    f fn(Int) Int,
+    g fn(Int) Int
+) fn(Int) Int {
+    fn sum(x Int) Int {
+        return f(x) + g(x);
+    }
+    return sum;
+}
+
+# multiply returns the sum of f and g as integer-to-integer function.
+fn multiply(
+    f fn(Int) Int,
+    g fn(Int) Int
+) fn(Int) Int {
+    fn product(x Int) Int {
+        return f(x) * g(x);
+    }
+    return product;
+}
+
+# constantFunction returns a constant function.
+fn constantFunction(
+    c Int
+) fn(Int) Int {
+    fn constant(y Int) Int {
+        return c;
+    }
+    return constant;
+}
+
+# scaleFunction returns a function that scales g by s.
+fn scaleFunction(
+    s Int,
+    g fn(Int) Int
+) fn(Int) Int {
+    fn scaled(y Int) Int {
+        return s * g(y);
+    }
+    return scaled;
+}
+
+# Polynomial: x^2 - 91x - 1712
+let polynomial = add(
+    add(multiply(identityFunction, identityFunction), scaleFunction(-91, identityFunction)),
+    constantFunction(-1712)
+);
+
+# Check the expected roots
+polynomial(107) == 0 && polynomial(-16) == 0;

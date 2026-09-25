@@ -49,6 +49,7 @@ func TestScripts(t *testing.T) {
 		{"v0.3.0/showcase.gt", objects.Bool(true)},
 		{"v0.4.0/function_scale.gt", objects.Int(5136)},
 		{"v0.4.0/fibonacci_closure.gt", objects.Int(21)},
+		{"v0.4.0/polynomials.gt", objects.Bool(true)},
 	}
 
 	for _, tt := range tests {

@@ -37,7 +37,16 @@ Expressions follow a strict precedence hierarchy (lowest to highest):
 - **Lexical scope:** Functions capture the environment in which they are declared,
   allowing closures to access variables from their surrounding scope.
 
-### 4. Functions
+### 4. Comments
+
+GoTiny supports single-line comments using `#`. A comment can start anywhere on a line and extends to the end of that line.
+
+```gt
+# This is a comment
+let x = 1712; # Comments can also follow code
+```
+
+### 5. Functions
 
 Functions can be declared with typed parameters and a return type:
 
@@ -72,6 +81,13 @@ Functions support:
 go install github.com/shsiddhant/gotiny/cmd/gotiny@latest
 ```
 
+## VS Code
+
+A small VS Code extension with basic GoTiny syntax highlighting and
+comment support is available separately:
+
+https://github.com/shsiddhant/gotiny-language-support
+
 ## Usage
 
 ### Executing Scripts
@@ -88,10 +104,13 @@ The main showcase for v0.4.0 is:
 `scripts/v0.4.0/fibonacci_closure.gt`
 
 ```gt
+# fibonacci returns a function that produces the Fibonacci sequence
+# one by one: 1, 1, 2, 3, 5, ...
 fn fibonacci() fn() Int {
     let current = 0;
     let next = 1;
 
+    # genNext captures and updates current and next, preserving its state between calls.
     fn genNext() Int {
         let newNext = current + next;
         current = next;
@@ -102,8 +121,9 @@ fn fibonacci() fn() Int {
 }
 
 let f = fibonacci();
+
 f(); f(); f(); f();
-f(); f(); f(); f();
+f(); f(); f(); f(); # The final result is the 8th Fibonacci number: 21
 ```
 
 This produces:
@@ -265,6 +285,7 @@ The interpreter is currently split into these components:
   - [x] Closures
   - [x] Recursion
   - [x] Functions as parameters and return values
+- [x] Comments
 - [ ] Print statement
 - [ ] While loops
 - [ ] Strings

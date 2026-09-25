@@ -1,7 +1,10 @@
+# fibonacci returns a function that produces the Fibonacci sequence
+# one by one: 1, 1, 2, 3, 5, ...
 fn fibonacci() fn() Int {
     let current = 0;
     let next = 1;
 
+    # genNext captures and updates current and next, preserving its state between calls.
     fn genNext() Int {
         let newNext = current + next;
         current = next;
@@ -12,5 +15,6 @@ fn fibonacci() fn() Int {
 }
 
 let f = fibonacci();
+
 f(); f(); f(); f();
-f(); f(); f(); f();
+f(); f(); f(); f(); # The final result is the 8th Fibonacci number: 21

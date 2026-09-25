@@ -101,6 +101,16 @@ func (l *Lexer) identifierOrKeyword(line int, column int) token.Token {
 	}
 }
 
+func (l *Lexer) skipComment() {
+	for !l.isAtEnd() {
+		switch l.peek() {
+		case '\n':
+			return
+		}
+		l.advance()
+	}
+}
+
 func (l *Lexer) Next() (token.Token, error) {
 	l.skipWhitespace()
 	l.start = l.current
@@ -113,7 +123,11 @@ func (l *Lexer) Next() (token.Token, error) {
 	c := l.advance()
 
 	switch c {
-	//Operators
+	case '#':
+		// Comments
+		l.skipComment()
+		return l.Next()
+	// Operators
 	case '+':
 		return token.Token{
 			Type:   token.Plus,

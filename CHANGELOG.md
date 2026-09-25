@@ -2,11 +2,12 @@
 
 All notable changes to GoTiny are documented in this file.
 
-## [Unreleased]
+## [0.4.1] - 2026-09-25
 
 ### Added
 
--
+- Add support for single-line comments using `#`. A comment can start anywhere on a line and extends to the end of that line.
+- Add integration test scripts with comments.
 
 ## [0.4.0] - 2026-09-25
 
