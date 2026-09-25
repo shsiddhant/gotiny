@@ -43,9 +43,21 @@ func main() {
 func formatError(err error, filePath string) string {
 	switch e := err.(type) {
 	case *parser.ParseError:
-		return fmt.Sprintf("%s:%d:%d: %s", filePath, e.Token.Line, e.Token.Column, e.Message)
+		return fmt.Sprintf(
+			"%s:%d:%d: %s",
+			filePath,
+			e.Token.Line,
+			e.Token.Column,
+			e.Message,
+		)
 	case *checker.CheckError:
-		return fmt.Sprintf("%s:%d:%d: %s", filePath, e.Token.Line, e.Token.Column, e.Message)
+		return fmt.Sprintf(
+			"%s:%d:%d: %s",
+			filePath,
+			e.Token.Line,
+			e.Token.Column,
+			e.Message,
+		)
 	case *evaluator.EvalError:
 		return fmt.Sprintf("%s:%d:%d: %s", filePath, e.Line, e.Column, e.Message)
 	}

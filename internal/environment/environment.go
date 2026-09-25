@@ -46,7 +46,11 @@ func (e *Environment) Assign(name string, value objects.Value) error {
 		return fmt.Errorf("undefined variable: %s", name)
 	}
 	if current.Type() != value.Type() {
-		return fmt.Errorf("cannot assign %s value to %s variable", value.Type(), current.Type())
+		return fmt.Errorf(
+			"cannot assign %s value to %s variable",
+			value.Type(),
+			current.Type(),
+		)
 	}
 	e.values[name] = value
 	return nil

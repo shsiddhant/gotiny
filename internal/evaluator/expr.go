@@ -11,7 +11,10 @@ import (
 
 // Note: eval* functions now assume type checks have already been done.
 
-func evalUnary(expr *ast.UnaryExpr, env *environment.Environment) (objects.Value, error) {
+func evalUnary(
+	expr *ast.UnaryExpr,
+	env *environment.Environment,
+) (objects.Value, error) {
 	operandEval, err := EvalExpr(expr.Operand, env)
 
 	if err != nil {
@@ -35,7 +38,10 @@ func evalUnary(expr *ast.UnaryExpr, env *environment.Environment) (objects.Value
 
 }
 
-func evalIntBinary(left, right objects.Value, operator token.Token) (objects.Value, error) {
+func evalIntBinary(
+	left, right objects.Value,
+	operator token.Token,
+) (objects.Value, error) {
 
 	leftInt, rightInt := left.(objects.Int), right.(objects.Int)
 	switch operator.Type {
@@ -71,7 +77,10 @@ func evalIntBinary(left, right objects.Value, operator token.Token) (objects.Val
 	}
 }
 
-func evalEquality(left, right objects.Value, operator token.Token) (objects.Value, error) {
+func evalEquality(
+	left, right objects.Value,
+	operator token.Token,
+) (objects.Value, error) {
 	switch operator.Type {
 	case token.EqualEqual:
 		return objects.Bool(left == right), nil
@@ -86,7 +95,10 @@ func evalEquality(left, right objects.Value, operator token.Token) (objects.Valu
 	}
 }
 
-func evalBinary(expr *ast.BinaryExpr, env *environment.Environment) (objects.Value, error) {
+func evalBinary(
+	expr *ast.BinaryExpr,
+	env *environment.Environment,
+) (objects.Value, error) {
 	left, err := EvalExpr(expr.Left, env)
 
 	if err != nil {
@@ -94,7 +106,14 @@ func evalBinary(expr *ast.BinaryExpr, env *environment.Environment) (objects.Val
 	}
 
 	switch expr.Operator.Type {
-	case token.Plus, token.Minus, token.Star, token.Slash, token.Less, token.LessEqual, token.Greater, token.GreaterEqual:
+	case token.Plus,
+		token.Minus,
+		token.Star,
+		token.Slash,
+		token.Less,
+		token.LessEqual,
+		token.Greater,
+		token.GreaterEqual:
 		right, err := EvalExpr(expr.Right, env)
 		if err != nil {
 			return nil, err

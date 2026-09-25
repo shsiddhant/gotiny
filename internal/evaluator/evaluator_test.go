@@ -229,7 +229,11 @@ func TestEvalEmptyProgram(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	got, err := EvalProgram(program, environment.NewEnvironment(), checker.NewTypeEnvironment())
+	got, err := EvalProgram(
+		program,
+		environment.NewEnvironment(),
+		checker.NewTypeEnvironment(),
+	)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -254,7 +258,11 @@ func TestEvalTypeErrors(t *testing.T) {
 			t.Fatalf("%q: parse error: %v", input, err)
 		}
 
-		_, err = EvalProgram(program, environment.NewEnvironment(), checker.NewTypeEnvironment())
+		_, err = EvalProgram(
+			program,
+			environment.NewEnvironment(),
+			checker.NewTypeEnvironment(),
+		)
 		if err == nil {
 			t.Errorf("%q: expected evaluation error", input)
 		}

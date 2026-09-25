@@ -23,7 +23,10 @@ func (e *EvalError) Error() string {
 	)
 }
 
-func evalAssignStmt(stmt *ast.AssignStmt, env *environment.Environment) (objects.Value, error) {
+func evalAssignStmt(
+	stmt *ast.AssignStmt,
+	env *environment.Environment,
+) (objects.Value, error) {
 	value, err := EvalExpr(stmt.Value, env)
 
 	if err != nil {
@@ -40,7 +43,10 @@ func evalAssignStmt(stmt *ast.AssignStmt, env *environment.Environment) (objects
 	return nil, nil
 }
 
-func evalLetStmt(stmt *ast.LetStmt, env *environment.Environment) (objects.Value, error) {
+func evalLetStmt(
+	stmt *ast.LetStmt,
+	env *environment.Environment,
+) (objects.Value, error) {
 	value, err := EvalExpr(stmt.Value, env)
 
 	if err != nil {
@@ -58,7 +64,10 @@ func evalLetStmt(stmt *ast.LetStmt, env *environment.Environment) (objects.Value
 	return nil, nil
 }
 
-func evalReturnStmt(stmt *ast.ReturnStmt, env *environment.Environment) (objects.Value, error) {
+func evalReturnStmt(
+	stmt *ast.ReturnStmt,
+	env *environment.Environment,
+) (objects.Value, error) {
 	value, err := EvalExpr(stmt.Expr, env)
 	if err != nil {
 		return nil, err
@@ -67,7 +76,10 @@ func evalReturnStmt(stmt *ast.ReturnStmt, env *environment.Environment) (objects
 	return &objects.ReturnValue{Value: value}, nil
 }
 
-func evalBlockStmt(stmt *ast.BlockStmt, env *environment.Environment) (objects.Value, error) {
+func evalBlockStmt(
+	stmt *ast.BlockStmt,
+	env *environment.Environment,
+) (objects.Value, error) {
 	blockEnv := env.NewChild()
 
 	var result objects.Value
@@ -120,7 +132,11 @@ func evalStmt(stmt ast.Stmt, env *environment.Environment) (objects.Value, error
 	}
 }
 
-func EvalProgram(program *ast.Program, env *environment.Environment, typeEnv *checker.TypeEnvironment) (objects.Value, error) {
+func EvalProgram(
+	program *ast.Program,
+	env *environment.Environment,
+	typeEnv *checker.TypeEnvironment,
+) (objects.Value, error) {
 	if err := checker.CheckProgram(program, typeEnv); err != nil {
 		return nil, err
 	}

@@ -139,7 +139,8 @@ func (p *Parser) primary() (ast.Expr, error) {
 }
 
 func (p *Parser) unary() (ast.Expr, error) {
-	if p.current.Type == token.Plus || p.current.Type == token.Minus || p.current.Type == token.Not {
+	if p.current.Type == token.Plus || p.current.Type == token.Minus ||
+		p.current.Type == token.Not {
 		operator := p.current
 
 		if err := p.advance(); err != nil {
@@ -583,7 +584,12 @@ func (p *Parser) fnDeclareStatement() (ast.Stmt, error) {
 		return nil, err
 	}
 
-	return &ast.FnDeclareStmt{Name: name, Parameters: params, ReturnType: returnType, Body: body}, nil
+	return &ast.FnDeclareStmt{
+		Name:       name,
+		Parameters: params,
+		ReturnType: returnType,
+		Body:       body,
+	}, nil
 }
 
 func (p *Parser) statement() (ast.Stmt, error) {

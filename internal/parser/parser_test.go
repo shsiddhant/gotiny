@@ -312,7 +312,10 @@ func TestParserEmptyIfBlock(t *testing.T) {
 		t.Fatal("expected else block, got nil")
 	}
 	if len(elseBlock.Statements) != 0 {
-		t.Fatalf("got %d statements in else block, expected 0", len(elseBlock.Statements))
+		t.Fatalf(
+			"got %d statements in else block, expected 0",
+			len(elseBlock.Statements),
+		)
 	}
 }
 
@@ -390,7 +393,10 @@ func TestParserComparisonMalformed(t *testing.T) {
 		t.Fatalf("expected parse error at line: 1, got %d", parseErr.Token.Line)
 	}
 	if parseErr.Token.Value != "=" {
-		t.Fatalf("expected parse error for token value \"=\", got %q", parseErr.Token.Value)
+		t.Fatalf(
+			"expected parse error for token value \"=\", got %q",
+			parseErr.Token.Value,
+		)
 	}
 
 }
@@ -435,7 +441,10 @@ func TestParserMalformedEquality(t *testing.T) {
 		t.Fatalf("expected parse error at line: 1, got %d", parseErr.Token.Line)
 	}
 	if parseErr.Token.Value != "=" {
-		t.Fatalf("expected parse error for token value \"=\", got %q", parseErr.Token.Value)
+		t.Fatalf(
+			"expected parse error for token value \"=\", got %q",
+			parseErr.Token.Value,
+		)
 	}
 
 }
@@ -457,7 +466,10 @@ func TestParserMalformedInEquality(t *testing.T) {
 		t.Fatalf("expected parse error at line: 1, got %d", parseErr.Token.Line)
 	}
 	if parseErr.Token.Value != "==" {
-		t.Fatalf("expected parse error for token value \"==\", got %q", parseErr.Token.Value)
+		t.Fatalf(
+			"expected parse error for token value \"==\", got %q",
+			parseErr.Token.Value,
+		)
 	}
 
 }

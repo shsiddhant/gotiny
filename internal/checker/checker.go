@@ -95,7 +95,11 @@ func checkLetStmt(stmt *ast.LetStmt, env *TypeEnvironment) error {
 	return nil
 }
 
-func checkReturnStmt(stmt *ast.ReturnStmt, env *TypeEnvironment, ctx *CheckContext) error {
+func checkReturnStmt(
+	stmt *ast.ReturnStmt,
+	env *TypeEnvironment,
+	ctx *CheckContext,
+) error {
 	if ctx == nil {
 		return &CheckError{
 			Token:   stmt.Expr.LocToken(),
@@ -109,15 +113,23 @@ func checkReturnStmt(stmt *ast.ReturnStmt, env *TypeEnvironment, ctx *CheckConte
 
 	if returnType != ctx.ReturnType {
 		return &CheckError{
-			Token:   stmt.Expr.LocToken(),
-			Message: fmt.Sprintf("cannot return %s from function expecting %s", returnType, ctx.ReturnType),
+			Token: stmt.Expr.LocToken(),
+			Message: fmt.Sprintf(
+				"cannot return %s from function expecting %s",
+				returnType,
+				ctx.ReturnType,
+			),
 		}
 	}
 
 	return nil
 }
 
-func checkBlockStmt(stmt *ast.BlockStmt, env *TypeEnvironment, ctx *CheckContext) error {
+func checkBlockStmt(
+	stmt *ast.BlockStmt,
+	env *TypeEnvironment,
+	ctx *CheckContext,
+) error {
 	for _, childStmt := range stmt.Statements {
 		if err := checkStmt(childStmt, env, ctx); err != nil {
 			return err
@@ -165,7 +177,10 @@ func checkFnDeclareStmt(stmt *ast.FnDeclareStmt, env *TypeEnvironment) error {
 		paramTypes = append(paramTypes, param.Type)
 	}
 
-	fnType := &objects.FunctionType{ParameterTypes: paramTypes, ReturnType: stmt.ReturnType}
+	fnType := &objects.FunctionType{
+		ParameterTypes: paramTypes,
+		ReturnType:     stmt.ReturnType,
+	}
 
 	fnTypeEnv := env.NewChild()
 
@@ -190,8 +205,11 @@ func checkFnDeclareStmt(stmt *ast.FnDeclareStmt, env *TypeEnvironment) error {
 
 	if stmt.ReturnType != objects.VoidType && !alwaysReturns(stmt.Body) {
 		return &CheckError{
-			Token:   stmt.Name,
-			Message: fmt.Sprintf("missing return statement at end of function %q", stmt.Name.Value),
+			Token: stmt.Name,
+			Message: fmt.Sprintf(
+				"missing return statement at end of function %q",
+				stmt.Name.Value,
+			),
 		}
 	}
 
@@ -245,7 +263,10 @@ func typeOfUnary(expr *ast.UnaryExpr, env *TypeEnvironment) (objects.Type, error
 			return nil, &CheckError{
 				Token: expr.LocToken(),
 				Message: fmt.Sprintf(
-					"unary operator %q cannot be applied to %s", expr.Operator.Value, operandType),
+					"unary operator %q cannot be applied to %s",
+					expr.Operator.Value,
+					operandType,
+				),
 			}
 		}
 		return operandType, nil
@@ -254,7 +275,10 @@ func typeOfUnary(expr *ast.UnaryExpr, env *TypeEnvironment) (objects.Type, error
 			return nil, &CheckError{
 				Token: expr.LocToken(),
 				Message: fmt.Sprintf(
-					"unary operator %q cannot be applied to %s", expr.Operator.Value, operandType),
+					"unary operator %q cannot be applied to %s",
+					expr.Operator.Value,
+					operandType,
+				),
 			}
 		}
 		return objects.BoolType, nil
@@ -357,8 +381,12 @@ func typeOfCallExpr(expr *ast.CallExpr, env *TypeEnvironment) (objects.Type, err
 
 	if len(expr.Args) != len(fnType.ParameterTypes) {
 		return nil, &CheckError{
-			Token:   expr.LocToken(),
-			Message: fmt.Sprintf("expected %d args, got %d", len(fnType.ParameterTypes), len(expr.Args)),
+			Token: expr.LocToken(),
+			Message: fmt.Sprintf(
+				"expected %d args, got %d",
+				len(fnType.ParameterTypes),
+				len(expr.Args),
+			),
 		}
 	}
 
@@ -369,8 +397,12 @@ func typeOfCallExpr(expr *ast.CallExpr, env *TypeEnvironment) (objects.Type, err
 		}
 		if argType != fnType.ParameterTypes[i] {
 			return nil, &CheckError{
-				Token:   arg.LocToken(),
-				Message: fmt.Sprintf("expected %s arg, got %s", fnType.ParameterTypes[i], argType),
+				Token: arg.LocToken(),
+				Message: fmt.Sprintf(
+					"expected %s arg, got %s",
+					fnType.ParameterTypes[i],
+					argType,
+				),
 			}
 		}
 	}

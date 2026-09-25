@@ -34,7 +34,10 @@ func (f *Function) String() string {
 	)
 }
 
-func evalFnDeclareStmt(stmt *ast.FnDeclareStmt, env *environment.Environment) (objects.Value, error) {
+func evalFnDeclareStmt(
+	stmt *ast.FnDeclareStmt,
+	env *environment.Environment,
+) (objects.Value, error) {
 	value := &Function{
 		Declaration: stmt,
 		Env:         env,
@@ -49,7 +52,10 @@ func evalFnDeclareStmt(stmt *ast.FnDeclareStmt, env *environment.Environment) (o
 	return nil, nil
 }
 
-func evalCallExpr(expr *ast.CallExpr, env *environment.Environment) (objects.Value, error) {
+func evalCallExpr(
+	expr *ast.CallExpr,
+	env *environment.Environment,
+) (objects.Value, error) {
 	function, err := env.Get(expr.Name.Value)
 	if err != nil {
 		return nil, err

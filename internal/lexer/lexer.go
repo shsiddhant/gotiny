@@ -115,64 +115,171 @@ func (l *Lexer) Next() (token.Token, error) {
 	switch c {
 	//Operators
 	case '+':
-		return token.Token{Type: token.Plus, Value: "+", Line: line, Column: column}, nil
+		return token.Token{
+			Type:   token.Plus,
+			Value:  "+",
+			Line:   line,
+			Column: column,
+		}, nil
 	case '-':
-		return token.Token{Type: token.Minus, Value: "-", Line: line, Column: column}, nil
+		return token.Token{
+			Type:   token.Minus,
+			Value:  "-",
+			Line:   line,
+			Column: column,
+		}, nil
 	case '*':
-		return token.Token{Type: token.Star, Value: "*", Line: line, Column: column}, nil
+		return token.Token{
+			Type:   token.Star,
+			Value:  "*",
+			Line:   line,
+			Column: column,
+		}, nil
 	case '/':
-		return token.Token{Type: token.Slash, Value: "/", Line: line, Column: column}, nil
+		return token.Token{
+			Type:   token.Slash,
+			Value:  "/",
+			Line:   line,
+			Column: column,
+		}, nil
 	case '=':
 		if l.peek() == '=' {
 			l.advance()
-			return token.Token{Type: token.EqualEqual, Value: "==", Line: line, Column: column}, nil
+			return token.Token{
+				Type:   token.EqualEqual,
+				Value:  "==",
+				Line:   line,
+				Column: column,
+			}, nil
 		}
-		return token.Token{Type: token.Equal, Value: "=", Line: line, Column: column}, nil
+		return token.Token{
+			Type:   token.Equal,
+			Value:  "=",
+			Line:   line,
+			Column: column,
+		}, nil
 	case '>':
 		if l.peek() == '=' {
 			l.advance()
-			return token.Token{Type: token.GreaterEqual, Value: ">=", Line: line, Column: column}, nil
+			return token.Token{
+				Type:   token.GreaterEqual,
+				Value:  ">=",
+				Line:   line,
+				Column: column,
+			}, nil
 		}
-		return token.Token{Type: token.Greater, Value: ">", Line: line, Column: column}, nil
+		return token.Token{
+			Type:   token.Greater,
+			Value:  ">",
+			Line:   line,
+			Column: column,
+		}, nil
 	case '<':
 		if l.peek() == '=' {
 			l.advance()
-			return token.Token{Type: token.LessEqual, Value: "<=", Line: line, Column: column}, nil
+			return token.Token{
+				Type:   token.LessEqual,
+				Value:  "<=",
+				Line:   line,
+				Column: column,
+			}, nil
 		}
-		return token.Token{Type: token.Less, Value: "<", Line: line, Column: column}, nil
+		return token.Token{
+			Type:   token.Less,
+			Value:  "<",
+			Line:   line,
+			Column: column,
+		}, nil
 	case '!':
 		if l.peek() == '=' {
 			l.advance()
-			return token.Token{Type: token.NotEqual, Value: "!=", Line: line, Column: column}, nil
+			return token.Token{
+				Type:   token.NotEqual,
+				Value:  "!=",
+				Line:   line,
+				Column: column,
+			}, nil
 		}
 		return token.Token{Type: token.Not, Value: "!", Line: line, Column: column}, nil
 	case '&':
 		peek := l.peek()
 		if l.peek() == '&' {
 			l.advance()
-			return token.Token{Type: token.And, Value: "&&", Line: line, Column: column}, nil
+			return token.Token{
+				Type:   token.And,
+				Value:  "&&",
+				Line:   line,
+				Column: column,
+			}, nil
 		}
-		return token.Token{Line: line, Column: column}, fmt.Errorf("expected '&', got '%c'", peek)
+		return token.Token{
+			Line:   line,
+			Column: column,
+		}, fmt.Errorf(
+			"expected '&', got '%c'",
+			peek,
+		)
 	case '|':
 		peek := l.peek()
 		if l.peek() == '|' {
 			l.advance()
-			return token.Token{Type: token.Or, Value: "||", Line: line, Column: column}, nil
+			return token.Token{
+				Type:   token.Or,
+				Value:  "||",
+				Line:   line,
+				Column: column,
+			}, nil
 		}
-		return token.Token{Line: line, Column: column}, fmt.Errorf("expected '|', got '%c'", peek)
+		return token.Token{
+			Line:   line,
+			Column: column,
+		}, fmt.Errorf(
+			"expected '|', got '%c'",
+			peek,
+		)
 	// Delimiters
 	case ';':
-		return token.Token{Type: token.SemiColon, Value: ";", Line: line, Column: column}, nil
+		return token.Token{
+			Type:   token.SemiColon,
+			Value:  ";",
+			Line:   line,
+			Column: column,
+		}, nil
 	case '(':
-		return token.Token{Type: token.LeftParen, Value: "(", Line: line, Column: column}, nil
+		return token.Token{
+			Type:   token.LeftParen,
+			Value:  "(",
+			Line:   line,
+			Column: column,
+		}, nil
 	case ')':
-		return token.Token{Type: token.RightParen, Value: ")", Line: line, Column: column}, nil
+		return token.Token{
+			Type:   token.RightParen,
+			Value:  ")",
+			Line:   line,
+			Column: column,
+		}, nil
 	case '{':
-		return token.Token{Type: token.LeftCurlyBrace, Value: "{", Line: line, Column: column}, nil
+		return token.Token{
+			Type:   token.LeftCurlyBrace,
+			Value:  "{",
+			Line:   line,
+			Column: column,
+		}, nil
 	case '}':
-		return token.Token{Type: token.RightCurlyBrace, Value: "}", Line: line, Column: column}, nil
+		return token.Token{
+			Type:   token.RightCurlyBrace,
+			Value:  "}",
+			Line:   line,
+			Column: column,
+		}, nil
 	case ',':
-		return token.Token{Type: token.Comma, Value: ",", Line: line, Column: column}, nil
+		return token.Token{
+			Type:   token.Comma,
+			Value:  ",",
+			Line:   line,
+			Column: column,
+		}, nil
 	}
 
 	if isDigit(c) {
@@ -183,7 +290,13 @@ func (l *Lexer) Next() (token.Token, error) {
 		return l.identifierOrKeyword(line, column), nil
 	}
 
-	return token.Token{Line: line, Column: column}, fmt.Errorf("unexpected character: \"%c\"", c)
+	return token.Token{
+		Line:   line,
+		Column: column,
+	}, fmt.Errorf(
+		"unexpected character: \"%c\"",
+		c,
+	)
 }
 
 var keywords = map[string]token.TokenType{

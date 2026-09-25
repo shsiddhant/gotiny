@@ -74,6 +74,8 @@ func TestEnvironmentScopeIsolation(t *testing.T) {
 
 	_, err := parent.Get("innerOnly")
 	if err == nil {
-		t.Error("expected error when looking up inner scope variable from parent, got nil")
+		t.Error(
+			"expected error when looking up inner scope variable from parent, got nil",
+		)
 	}
 }

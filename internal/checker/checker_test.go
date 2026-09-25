@@ -326,7 +326,11 @@ func TestTypeChecker(t *testing.T) {
 					return
 				}
 				if !strings.Contains(err.Error(), tt.errorSubstr) {
-					t.Errorf("expected error to contain %q, got total message: %q", tt.errorSubstr, err.Error())
+					t.Errorf(
+						"expected error to contain %q, got total message: %q",
+						tt.errorSubstr,
+						err.Error(),
+					)
 				}
 			} else {
 				if err != nil {

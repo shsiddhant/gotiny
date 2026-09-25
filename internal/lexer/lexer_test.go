@@ -46,7 +46,11 @@ func TestLexer(t *testing.T) {
 
 		if got.Type == token.EOF {
 			if i != len(expected)-1 {
-				t.Errorf("lexer reached EOF early: got %d tokens, expected %d", i+1, len(expected))
+				t.Errorf(
+					"lexer reached EOF early: got %d tokens, expected %d",
+					i+1,
+					len(expected),
+				)
 			}
 			break
 		}
@@ -95,7 +99,11 @@ func TestLexerKeywords(t *testing.T) {
 
 		if got.Type == token.EOF {
 			if i != len(expected)-1 {
-				t.Errorf("lexer reached EOF early: got %d tokens, expected %d", i+1, len(expected))
+				t.Errorf(
+					"lexer reached EOF early: got %d tokens, expected %d",
+					i+1,
+					len(expected),
+				)
 			}
 			break
 		}
@@ -145,7 +153,11 @@ y - x;`
 
 		if got.Type == token.EOF {
 			if i != len(expected)-1 {
-				t.Errorf("lexer reached EOF early: got %d tokens, expected %d", i+1, len(expected))
+				t.Errorf(
+					"lexer reached EOF early: got %d tokens, expected %d",
+					i+1,
+					len(expected),
+				)
 			}
 			break
 		}
@@ -197,7 +209,11 @@ a > b
 
 		if got.Type == token.EOF {
 			if i != len(expected)-1 {
-				t.Errorf("lexer reached EOF early: got %d tokens, expected %d", i+1, len(expected))
+				t.Errorf(
+					"lexer reached EOF early: got %d tokens, expected %d",
+					i+1,
+					len(expected),
+				)
 			}
 			break
 		}
@@ -232,7 +248,11 @@ func TestLexerBoolean(t *testing.T) {
 
 		if got.Type == token.EOF {
 			if i != len(expected)-1 {
-				t.Errorf("lexer reached EOF early: got %d tokens, expected %d", i+1, len(expected))
+				t.Errorf(
+					"lexer reached EOF early: got %d tokens, expected %d",
+					i+1,
+					len(expected),
+				)
 			}
 			break
 		}
