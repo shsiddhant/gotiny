@@ -111,7 +111,7 @@ func checkReturnStmt(
 		return err
 	}
 
-	if returnType != ctx.ReturnType {
+	if !objects.SameType(returnType, ctx.ReturnType) {
 		return &CheckError{
 			Token: stmt.Expr.LocToken(),
 			Message: fmt.Sprintf(
@@ -143,7 +143,7 @@ func checkIfStmt(stmt *ast.IfStmt, env *TypeEnvironment, ctx *CheckContext) erro
 	if err != nil {
 		return err
 	}
-	if condType != objects.BoolType {
+	if !objects.SameType(condType, objects.BoolType) {
 		return &CheckError{
 			Token:   stmt.Cond.LocToken(),
 			Message: fmt.Sprintf("condition must be BoolType, got %s", condType),
@@ -203,7 +203,8 @@ func checkFnDeclareStmt(stmt *ast.FnDeclareStmt, env *TypeEnvironment) error {
 		return err
 	}
 
-	if stmt.ReturnType != objects.VoidType && !alwaysReturns(stmt.Body) {
+	if !objects.SameType(stmt.ReturnType, objects.VoidType) &&
+		!alwaysReturns(stmt.Body) {
 		return &CheckError{
 			Token: stmt.Name,
 			Message: fmt.Sprintf(
@@ -259,7 +260,7 @@ func typeOfUnary(expr *ast.UnaryExpr, env *TypeEnvironment) (objects.Type, error
 
 	switch expr.Operator.Type {
 	case token.Plus, token.Minus:
-		if operandType != objects.IntType {
+		if !objects.SameType(operandType, objects.IntType) {
 			return nil, &CheckError{
 				Token: expr.LocToken(),
 				Message: fmt.Sprintf(
@@ -271,7 +272,7 @@ func typeOfUnary(expr *ast.UnaryExpr, env *TypeEnvironment) (objects.Type, error
 		}
 		return operandType, nil
 	case token.Not:
-		if operandType != objects.BoolType {
+		if !objects.SameType(operandType, objects.BoolType) {
 			return nil, &CheckError{
 				Token: expr.LocToken(),
 				Message: fmt.Sprintf(
@@ -304,7 +305,8 @@ func typeOfBinary(expr *ast.BinaryExpr, env *TypeEnvironment) (objects.Type, err
 
 	switch expr.Operator.Type {
 	case token.Plus, token.Minus, token.Star, token.Slash:
-		if leftType != objects.IntType || rightType != objects.IntType {
+		if !objects.SameType(leftType, objects.IntType) ||
+			!objects.SameType(rightType, objects.IntType) {
 			return nil, &CheckError{
 				Token: expr.LocToken(),
 				Message: fmt.Sprintf(
@@ -317,7 +319,8 @@ func typeOfBinary(expr *ast.BinaryExpr, env *TypeEnvironment) (objects.Type, err
 		}
 		return objects.IntType, nil
 	case token.Less, token.LessEqual, token.Greater, token.GreaterEqual:
-		if leftType != objects.IntType || rightType != objects.IntType {
+		if !objects.SameType(leftType, objects.IntType) ||
+			!objects.SameType(rightType, objects.IntType) {
 			return nil, &CheckError{
 				Token: expr.LocToken(),
 				Message: fmt.Sprintf(
@@ -330,7 +333,7 @@ func typeOfBinary(expr *ast.BinaryExpr, env *TypeEnvironment) (objects.Type, err
 		}
 		return objects.BoolType, nil
 	case token.EqualEqual, token.NotEqual:
-		if leftType != rightType {
+		if !objects.SameType(leftType, rightType) {
 			return nil, &CheckError{
 				Token: expr.LocToken(),
 				Message: fmt.Sprintf(
@@ -342,7 +345,8 @@ func typeOfBinary(expr *ast.BinaryExpr, env *TypeEnvironment) (objects.Type, err
 		}
 		return objects.BoolType, nil
 	case token.And, token.Or:
-		if leftType != objects.BoolType || rightType != objects.BoolType {
+		if !objects.SameType(leftType, objects.BoolType) ||
+			!objects.SameType(rightType, objects.BoolType) {
 			return nil, &CheckError{
 				Token: expr.LocToken(),
 				Message: fmt.Sprintf(
@@ -395,7 +399,7 @@ func typeOfCallExpr(expr *ast.CallExpr, env *TypeEnvironment) (objects.Type, err
 		if err != nil {
 			return nil, err
 		}
-		if argType != fnType.ParameterTypes[i] {
+		if !objects.SameType(argType, fnType.ParameterTypes[i]) {
 			return nil, &CheckError{
 				Token: arg.LocToken(),
 				Message: fmt.Sprintf(

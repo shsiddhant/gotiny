@@ -68,3 +68,29 @@ func (rt *ReturnValue) Type() Type {
 func (rt *ReturnValue) String() string {
 	return rt.Value.String()
 }
+
+func SameType(a, b Type) bool {
+	if a == b {
+		return true
+	}
+
+	switch a := a.(type) {
+	case *FunctionType:
+		b, ok := b.(*FunctionType)
+		if !ok {
+			return false
+		}
+
+		if len(a.ParameterTypes) != len(b.ParameterTypes) {
+			return false
+		}
+
+		for i := range a.ParameterTypes {
+			if !SameType(a.ParameterTypes[i], b.ParameterTypes[i]) {
+				return false
+			}
+		}
+		return SameType(a.ReturnType, b.ReturnType)
+	}
+	return false
+}
