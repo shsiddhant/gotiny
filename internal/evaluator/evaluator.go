@@ -94,13 +94,12 @@ func evalBlockStmt(
 	stmt *ast.BlockStmt,
 	env *environment.Environment,
 ) (objects.Value, error) {
-	blockEnv := env.NewChild()
 
 	var result objects.Value
 	var err error
 
 	for _, childStmt := range stmt.Statements {
-		result, err = evalStmt(childStmt, blockEnv)
+		result, err = evalStmt(childStmt, env)
 		if err != nil {
 			return nil, err
 		}
@@ -116,13 +115,14 @@ func evalIfStmt(stmt *ast.IfStmt, env *environment.Environment) (objects.Value, 
 	if err != nil {
 		return nil, err
 	}
-
 	boolValue := condValue.(objects.Bool)
 
 	if boolValue {
-		return evalBlockStmt(stmt.Body, env)
+		bodyEnv := env.NewChild()
+		return evalBlockStmt(stmt.Body, bodyEnv)
 	} else if stmt.Else != nil {
-		return evalBlockStmt(stmt.Else, env)
+		elseEnv := env.NewChild()
+		return evalBlockStmt(stmt.Else, elseEnv)
 	}
 	return nil, nil
 }

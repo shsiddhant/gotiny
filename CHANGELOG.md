@@ -2,6 +2,12 @@
 
 All notable changes to GoTiny are documented in this file.
 
+## [0.4.3] - 2026-09-26
+
+### Fixed
+
+- Align evaluator block scoping with static checker.
+
 ## [0.4.2] - 2026-09-26
 
 ### Added
