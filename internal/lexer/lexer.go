@@ -323,4 +323,5 @@ var keywords = map[string]token.TokenType{
 	"Int":    token.Int,
 	"Bool":   token.Bool,
 	"return": token.Return,
+	"print":  token.Print,
 }

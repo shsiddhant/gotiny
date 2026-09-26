@@ -21,6 +21,7 @@ const (
 	Int
 	Bool
 	Return
+	Print
 
 	// Operators
 

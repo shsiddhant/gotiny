@@ -168,4 +168,13 @@ func (stmt ReturnStmt) String() string {
 	return fmt.Sprintf("return %s", stmt.Expr)
 }
 
+// Print statement
+type PrintStmt struct {
+	Expr Expr
+}
 
+func (stmt PrintStmt) stmt() {}
+
+func (stmt PrintStmt) String() string {
+	return fmt.Sprintf("print %s", stmt.Expr)
+}

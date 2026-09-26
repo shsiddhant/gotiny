@@ -2,6 +2,17 @@
 
 All notable changes to GoTiny are documented in this file.
 
+## [0.4.2] - 2026-09-26
+
+### Added
+
+- Add a print statement to print expressions, for printing more than just the final output of a
+  program.
+
+### Changed
+
+- Move TypeString method to the objects package with consistency in usage.
+
 ## [0.4.1] - 2026-09-25
 
 ### Added

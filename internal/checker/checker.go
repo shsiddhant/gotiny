@@ -53,6 +53,8 @@ func checkStmt(stmt ast.Stmt, env *TypeEnvironment, ctx *CheckContext) error {
 		return checkReturnStmt(stmt, env, ctx)
 	case *ast.FnDeclareStmt:
 		return checkFnDeclareStmt(stmt, env)
+	case *ast.PrintStmt:
+		return checkPrintStmt(stmt, env)
 	default:
 		return fmt.Errorf("unknown statement type %T", stmt)
 	}
@@ -122,6 +124,14 @@ func checkReturnStmt(
 		}
 	}
 
+	return nil
+}
+
+func checkPrintStmt(stmt *ast.PrintStmt, env *TypeEnvironment) error {
+	_, err := typeOfExpr(stmt.Expr, env)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

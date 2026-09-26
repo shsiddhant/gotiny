@@ -481,6 +481,17 @@ func (p *Parser) returnStatement() (ast.Stmt, error) {
 	return &ast.ReturnStmt{Expr: expr}, nil
 }
 
+func (p *Parser) printStatement() (ast.Stmt, error) {
+	if err := p.consume(token.Print); err != nil {
+		return nil, err
+	}
+	expr, err := p.expression()
+	if err != nil {
+		return nil, err
+	}
+	return &ast.PrintStmt{Expr: expr}, nil
+}
+
 func (p *Parser) fnParam() (ast.Parameter, error) {
 	name := p.current
 	if err := p.consume(token.Identifier); err != nil {
@@ -768,6 +779,8 @@ func (p *Parser) statement() (ast.Stmt, error) {
 		return p.fnDeclareStatement()
 	case p.current.Type == token.Return:
 		stmt, err = p.returnStatement()
+	case p.current.Type == token.Print:
+		stmt, err = p.printStatement()
 	default:
 		stmt, err = p.exprStatement()
 	}

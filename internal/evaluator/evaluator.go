@@ -2,6 +2,7 @@ package evaluator
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/shsiddhant/gotiny/internal/ast"
 	"github.com/shsiddhant/gotiny/internal/checker"
@@ -61,6 +62,19 @@ func evalLetStmt(
 		}
 	}
 
+	return nil, nil
+}
+
+func evalPrintStmt(
+	stmt *ast.PrintStmt,
+	env *environment.Environment,
+) (objects.Value, error) {
+	value, err := EvalExpr(stmt.Expr, env)
+
+	if err != nil {
+		return nil, err
+	}
+	fmt.Fprintln(os.Stdout, value)
 	return nil, nil
 }
 
@@ -127,6 +141,8 @@ func evalStmt(stmt ast.Stmt, env *environment.Environment) (objects.Value, error
 		return evalReturnStmt(stmt, env)
 	case *ast.FnDeclareStmt:
 		return evalFnDeclareStmt(stmt, env)
+	case *ast.PrintStmt:
+		return evalPrintStmt(stmt, env)
 	default:
 		return nil, fmt.Errorf("unknown statement type %T", stmt)
 	}

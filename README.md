@@ -99,7 +99,7 @@ gotiny script.gt
 ```
 
 The repository includes several example programs in the scripts directory.
-The main showcase for v0.4.0 is:
+The main showcase is:
 
 `scripts/v0.4.0/fibonacci_closure.gt`
 
@@ -122,14 +122,29 @@ fn fibonacci() fn() Int {
 
 let f = fibonacci();
 
-f(); f(); f(); f();
-f(); f(); f(); f(); # The final result is the 8th Fibonacci number: 21
+print f(); # 1
+print f(); # 1
+print f(); # 2
+print f(); # 3
+print f(); # 5
+print f(); # 8
+print f(); # 13
+print f(); # 21
+f(); # Result of the program is the 9th fibonacci number: 34
 ```
 
 This produces:
 
 ```
+1
+1
+2
+3
+5
+8
+13
 21
+34
 ```
 
 The returned function is a closure that retains access to the mutable current and next
@@ -286,7 +301,7 @@ The interpreter is currently split into these components:
   - [x] Recursion
   - [x] Functions as parameters and return values
 - [x] Comments
-- [ ] Print statement
+- [x] Print statement
 - [ ] While loops
 - [ ] Strings
 

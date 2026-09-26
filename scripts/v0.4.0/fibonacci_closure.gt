@@ -16,5 +16,12 @@ fn fibonacci() fn() Int {
 
 let f = fibonacci();
 
-f(); f(); f(); f();
-f(); f(); f(); f(); # The final result is the 8th Fibonacci number: 21
+print f(); # 1
+print f(); # 1
+print f(); # 2
+print f(); # 3
+print f(); # 5
+print f(); # 8
+print f(); # 13
+print f(); # 21
+f(); # Result of the program is the 9th fibonacci number: 34
