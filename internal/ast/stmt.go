@@ -115,6 +115,18 @@ func (s IfStmt) String() string {
 	return str
 }
 
+// WhileStmt represents a while loop.
+type WhileStmt struct {
+	Cond Expr
+	Body *BlockStmt
+}
+
+func (s WhileStmt) stmt() {}
+
+func (s WhileStmt) String() string {
+	return fmt.Sprintf("while %s %s ", s.Cond, s.Body)
+}
+
 type Parameter struct {
 	Name token.Token
 	Type objects.Type

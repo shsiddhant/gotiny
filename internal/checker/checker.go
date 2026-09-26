@@ -49,6 +49,8 @@ func checkStmt(stmt ast.Stmt, env *TypeEnvironment, ctx *CheckContext) error {
 		return checkLetStmt(stmt, env)
 	case *ast.IfStmt:
 		return checkIfStmt(stmt, env, ctx)
+	case *ast.WhileStmt:
+		return checkWhileStmt(stmt, env, ctx)
 	case *ast.ReturnStmt:
 		return checkReturnStmt(stmt, env, ctx)
 	case *ast.FnDeclareStmt:
@@ -169,6 +171,29 @@ func checkIfStmt(stmt *ast.IfStmt, env *TypeEnvironment, ctx *CheckContext) erro
 		if err := checkBlockStmt(stmt.Else, elseEnv, ctx); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func checkWhileStmt(
+	stmt *ast.WhileStmt,
+	env *TypeEnvironment,
+	ctx *CheckContext,
+) error {
+	condType, err := typeOfExpr(stmt.Cond, env)
+	if err != nil {
+		return err
+	}
+	if !objects.SameType(condType, objects.BoolType) {
+		return &CheckError{
+			Token:   stmt.Cond.LocToken(),
+			Message: fmt.Sprintf("condition must be BoolType, got %s", condType),
+		}
+	}
+
+	bodyEnv := env.NewChild()
+	if err := checkBlockStmt(stmt.Body, bodyEnv, ctx); err != nil {
+		return err
 	}
 	return nil
 }

@@ -2,6 +2,11 @@
 
 All notable changes to GoTiny are documented in this file.
 
+## [0.5.0] - 2026-09-26
+
+- Add while loops syntax.
+- Add showcase and integration scripts for while loops.
+
 ## [0.4.3] - 2026-09-26
 
 ### Fixed

@@ -1,0 +1,21 @@
+# collatz returns the number of total iterations to reach 1 when starting at n.
+# For n <= 0, it returns 0.
+fn collatz(n Int) Int {
+    let count = 0;
+
+    while n > 1 {
+        if n / 2 * 2 == n {
+            n = n / 2;
+        } else {
+            n = 3 * n + 1;
+        }
+
+        count = count + 1;
+    }
+
+    return count;
+}
+
+print collatz(1205); # 18
+print collatz(1013); # 111
+collatz(1712); # Result of the program is collatz(1712): 104

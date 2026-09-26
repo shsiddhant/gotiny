@@ -470,6 +470,24 @@ func (p *Parser) ifStatement() (ast.Stmt, error) {
 	}, nil
 }
 
+func (p *Parser) whileStatement() (ast.Stmt, error) {
+	if err := p.consume(token.While); err != nil {
+		return nil, err
+	}
+	cond, err := p.expression()
+	if err != nil {
+		return nil, err
+	}
+	body, err := p.block()
+	if err != nil {
+		return nil, err
+	}
+	return &ast.WhileStmt{
+		Cond: cond,
+		Body: body,
+	}, nil
+}
+
 func (p *Parser) returnStatement() (ast.Stmt, error) {
 	if err := p.consume(token.Return); err != nil {
 		return nil, err
@@ -773,6 +791,8 @@ func (p *Parser) statement() (ast.Stmt, error) {
 		stmt, err = p.letStatement()
 	case p.current.Type == token.If:
 		return p.ifStatement()
+	case p.current.Type == token.While:
+		return p.whileStatement()
 	case p.current.Type == token.Identifier && p.peek.Type == token.Equal:
 		stmt, err = p.assignStatement()
 	case p.current.Type == token.Fn:

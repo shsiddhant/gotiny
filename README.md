@@ -46,7 +46,33 @@ GoTiny supports single-line comments using `#`. A comment can start anywhere on 
 let x = 1712; # Comments can also follow code
 ```
 
-### 5. Functions
+### 5. Conditionals and Loops, and Print
+
+GoTiny supports if else statements (with optional else block):
+
+```
+if condition {
+    ...
+} else {
+    ...
+}
+```
+
+It also support while loops:
+
+```
+while condition {
+    ....
+}
+```
+
+You can print any expression using a print statement:
+
+```
+print expression;
+```
+
+### 6. Functions
 
 Functions can be declared with typed parameters and a return type:
 
@@ -99,9 +125,11 @@ gotiny script.gt
 ```
 
 The repository includes several example programs in the scripts directory.
-The main showcase is:
+A few of them are shown below:
 
-`scripts/v0.4.0/fibonacci_closure.gt`
+#### 1. Fibonacci Closure Loop
+
+`scripts/v0.5.0/fibonacci_closure_loop.gt`
 
 ```gt
 # fibonacci returns a function that produces the Fibonacci sequence
@@ -122,18 +150,15 @@ fn fibonacci() fn() Int {
 
 let f = fibonacci();
 
-print f(); # 1
-print f(); # 1
-print f(); # 2
-print f(); # 3
-print f(); # 5
-print f(); # 8
-print f(); # 13
-print f(); # 21
+let i = 1;
+while i < 9 {
+    print f();
+    i = i+1;
+}
 f(); # Result of the program is the 9th fibonacci number: 34
 ```
 
-This produces:
+**Output:**
 
 ```
 1
@@ -149,6 +174,46 @@ This produces:
 
 The returned function is a closure that retains access to the mutable current and next
 variables from its enclosing function.
+
+#### 2. Collatz Iteration Count
+
+Another demonstration of the while loop:
+
+`scripts/v0.5.0/collatz.gt`
+
+```gt
+# collatz returns the number of total iterations to reach 1 when starting at n.
+# For n <= 0, it returns 0.
+fn collatz(n Int) Int {
+    let count = 0;
+
+    while n > 1 {
+        if n / 2 * 2 == n {
+            n = n / 2;
+        } else {
+            n = 3 * n + 1;
+        }
+
+        count = count + 1;
+    }
+
+    return count;
+}
+
+print collatz(1205); # 18
+print collatz(1013); # 111
+collatz(1712); # Result of the program is collatz(1712): 104
+```
+
+**Output:**
+
+```
+18
+111
+104
+```
+
+#### 3. Scale Function: Passing functions as arguments
 
 Another example demonstrates passing functions as arguments and returning closures:
 
@@ -174,7 +239,7 @@ let scaled = scaleFunction(s, base);
 scaled(1712);
 ```
 
-This produces:
+**Output:**
 
 ```
 5136
@@ -302,7 +367,7 @@ The interpreter is currently split into these components:
   - [x] Functions as parameters and return values
 - [x] Comments
 - [x] Print statement
-- [ ] While loops
+- [x] While loops
 - [ ] Strings
 
 ## License

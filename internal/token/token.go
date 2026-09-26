@@ -22,6 +22,7 @@ const (
 	Bool
 	Return
 	Print
+	While
 
 	// Operators
 

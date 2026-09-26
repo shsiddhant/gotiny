@@ -127,6 +127,34 @@ func evalIfStmt(stmt *ast.IfStmt, env *environment.Environment) (objects.Value, 
 	return nil, nil
 }
 
+func evalWhileStmt(
+	stmt *ast.WhileStmt,
+	env *environment.Environment,
+) (objects.Value, error) {
+
+	var result objects.Value
+
+	for {
+		condValue, err := EvalExpr(stmt.Cond, env)
+		if err != nil {
+			return nil, err
+		}
+		boolValue := condValue.(objects.Bool)
+
+		if !boolValue {
+			return result, nil
+		}
+		iterEnv := env.NewChild()
+		result, err = evalBlockStmt(stmt.Body, iterEnv)
+		if err != nil {
+			return nil, err
+		}
+		if _, ok := result.(*objects.ReturnValue); ok {
+			return result, nil
+		}
+	}
+}
+
 func evalStmt(stmt ast.Stmt, env *environment.Environment) (objects.Value, error) {
 	switch stmt := stmt.(type) {
 	case *ast.ExprStmt:
@@ -137,6 +165,8 @@ func evalStmt(stmt ast.Stmt, env *environment.Environment) (objects.Value, error
 		return evalLetStmt(stmt, env)
 	case *ast.IfStmt:
 		return evalIfStmt(stmt, env)
+	case *ast.WhileStmt:
+		return evalWhileStmt(stmt, env)
 	case *ast.ReturnStmt:
 		return evalReturnStmt(stmt, env)
 	case *ast.FnDeclareStmt:
