@@ -27,9 +27,13 @@ type FunctionType struct {
 func (t FunctionType) String() string {
 	params := []string{}
 	for _, pt := range t.ParameterTypes {
-		params = append(params, pt.String())
+		params = append(params, TypeString(pt))
 	}
-	return fmt.Sprintf("fn(%s) %s", strings.Join(params, ", "), t.ReturnType)
+	return fmt.Sprintf(
+		"fn(%s) %s",
+		strings.Join(params, ", "),
+		TypeString(t.ReturnType),
+	)
 }
 
 type Value interface {
@@ -93,4 +97,17 @@ func SameType(a, b Type) bool {
 		return SameType(a.ReturnType, b.ReturnType)
 	}
 	return false
+}
+
+func TypeString(t Type) string {
+	switch t {
+	case BoolType:
+		return "Bool"
+	case IntType:
+		return "Int"
+	case VoidType:
+		return "Void"
+	default:
+		return t.String()
+	}
 }

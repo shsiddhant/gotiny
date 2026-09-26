@@ -30,7 +30,7 @@ func (f *Function) String() string {
 		"%s(%s) %s",
 		f.Declaration.Name.Value,
 		strings.Join(params, ", "),
-		ast.TypeString(f.Declaration.ReturnType),
+		objects.TypeString(f.Declaration.ReturnType),
 	)
 }
 

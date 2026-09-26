@@ -121,7 +121,7 @@ type Parameter struct {
 }
 
 func (param Parameter) String() string {
-	return fmt.Sprintf("%s %s", param.Name.Value, TypeString(param.Type))
+	return fmt.Sprintf("%s %s", param.Name.Value, objects.TypeString(param.Type))
 }
 
 func GetParameterTypes(params []Parameter) []objects.Type {
@@ -152,7 +152,7 @@ func (stmt FnDeclareStmt) String() string {
 		"fn %s(%s) %s %s",
 		stmt.Name.Value,
 		strings.Join(params, ", "),
-		TypeString(stmt.ReturnType),
+		objects.TypeString(stmt.ReturnType),
 		stmt.Body,
 	)
 }
@@ -168,15 +168,4 @@ func (stmt ReturnStmt) String() string {
 	return fmt.Sprintf("return %s", stmt.Expr)
 }
 
-func TypeString(t objects.Type) string {
-	switch t {
-	case objects.BoolType:
-		return "Bool"
-	case objects.IntType:
-		return "Int"
-	case objects.VoidType:
-		return "Void"
-	default:
-		return t.String()
-	}
-}
+
